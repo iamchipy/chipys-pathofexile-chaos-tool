@@ -17,6 +17,8 @@ API_CHARACTER = API_ENDPOINT+"character"
 API_LEAGUE = API_ENDPOINT+"league"
 API_STASH = API_ENDPOINT+"stash/"
 
+DEPTH_ITEMS = 2
+
 class PoeApiHandler():
     def __init__(self, client_id, client_secret, uri, scope="account:stashes", force_re_auth:bool=False, manual_token:str=None):
         print("Building variables ...")
@@ -154,3 +156,8 @@ class PoeApiHandler():
                 if "Remove-only" in temp[ii]:
                     temp.remove(temp[ii])
         return temp
+
+    def _parse_names(self, depth=DEPTH_ITEMS, stash_dict=None):
+        """Parse separately so that we don't fetch for every ques """
+        if not stash_dict:
+            stash_dict = self.get_stash()
