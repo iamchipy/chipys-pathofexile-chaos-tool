@@ -1,4 +1,5 @@
-# chipytools
-chipy's PoE stash and array info
+# ChipyTools
+Python library for working with PoE's API. Primarily reading personal/private stash tabs.
 
-# This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
+# DISCLAIMER:
+This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
