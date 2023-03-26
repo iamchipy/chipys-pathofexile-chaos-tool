@@ -1,0 +1,5 @@
+REDIRECT_URI = ""
+CLIENT_ID = ""
+CLIENT_SECRET = ""
+SCOPE = "account:stashes account:profile"
+DEV_TOKEN = ""
