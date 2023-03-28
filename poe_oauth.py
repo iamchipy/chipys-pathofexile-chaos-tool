@@ -49,7 +49,8 @@ class PoeApiHandler():
         
 
     async def parse(self, url):
-        print("Parsing...")
+        
+        print("Parsing . . . ", end="")
         self.url_dict = urlparse(url)
         queries = parse_qs(self.url_dict[4])  #{'code': ['28bf9a843e5626d47a125ad384fe53f6e998335f'], 'state': ['fa6437e646eabcd1a575a81a06c94a1f74abc68d16bac2414d004241233c8b76']}
         if "error" in queries:
@@ -62,14 +63,14 @@ class PoeApiHandler():
     async def echo(self, websocket, path):
         async for message in websocket:
             await websocket.send(message)
-            # print("Received data:", message)
+            print("done")
             self.msg = message
             await self.parse(self.msg)
             self._exit.set_result(None)
+            print("done")
                 
     async def echo_server(self):
         async with websockets.serve(self.echo, '127.0.0.1', 32111):
-            print('Awaiting approval . . . ', end=" ")
             await self._exit
         print('Done')        
 
@@ -88,7 +89,7 @@ class PoeApiHandler():
     def _still_authenticated(self):
         if self._success_code_200(self.get_stash("standard")):
             return True
-        print("FAILED INIT AUTH")
+        print("FAILED with cached token")
         return False
             
     def _authenticate(self, force_re_auth=False):
@@ -116,7 +117,7 @@ class PoeApiHandler():
         # print(URL_AUTH+client_str+response_type+scope_str+state_str+redir)
 
         # Start the async loop
-        print("Waiting for approval ...")
+        print("Waiting for approval . . . ",end="")
         self.loop = asyncio.get_event_loop()
         self._exit = asyncio.Future() 
         self.loop.run_until_complete(self.echo_server())
