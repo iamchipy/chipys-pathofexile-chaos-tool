@@ -45,8 +45,7 @@ class PoeApiHandler():
 
         if manual_token:
             self._update_header_token(manual_token)
-        else:
-            self._authenticate(force_re_auth)
+        self._authenticate(force_re_auth)
         
 
     async def parse(self, url):

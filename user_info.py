@@ -14,8 +14,3 @@ cfg = configparser.ConfigParser()
 
 # load base info
 load()
-# REDIRECT_URI = cfg["api"]["REDIRECT_URI"]
-# CLIENT_ID = cfg["api"]["CLIENT_ID"]
-# CLIENT_SECRET = cfg["api"]['CLIENT_SECRET']
-# SCOPE = cfg["api"]["SCOPE"]
-# DEV_TOKEN = cfg["api"]["DEV_TOKEN"]

@@ -130,9 +130,13 @@ if __name__ == "__main__":
                                    client_secret=user_info.cfg["api"]["CLIENT_SECRET"],
                                    scope=user_info.cfg["api"]["SCOPE"],
                                    uri=user_info.cfg["api"]["REDIRECT_URI"],
-                                   manual_token=user_info.cfg["api"]["DEV_TOKEN"]
+                                   manual_token=user_info.cfg["api"]["TOKEN"]
                                    )
     parser = DataParser(api_handler = authentication)
+
+    # save any token changes
+    user_info.cfg["api"]["TOKEN"] = authentication.token
+    user_info.save()
 
     # set league
     league_of_interest = set_league(parser, "stand")
