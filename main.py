@@ -1,7 +1,7 @@
 
 import json
 from poe_oauth import PoeApiHandler
-from base_types import BASE_TYPES
+from base_types import SLOT_LOOKUP
 import user_info
 
 
@@ -118,11 +118,12 @@ def set_tab(parser:DataParser, user_input:str=None):
 def index_unid(parser:DataParser, list_of_items:list):
     counts={"a":1}
     for item in list_of_items:
-        slot = BASE_TYPES[item["baseType"]]
+        slot = SLOT_LOOKUP[item["baseType"]]
         if slot in counts:
             counts[slot] +=1
         else:
             counts[slot] = 1
+    
     return counts
 
 if __name__ == "__main__":
