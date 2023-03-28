@@ -46,6 +46,7 @@ class PoeApiHandler():
         if manual_token:
             self._update_header_token(manual_token)
         self._authenticate(force_re_auth)
+        print( "done")
         
 
     async def parse(self, url):
@@ -71,15 +72,14 @@ class PoeApiHandler():
                 
     async def echo_server(self):
         async with websockets.serve(self.echo, '127.0.0.1', 32111):
-            await self._exit
-        print('Done')        
+            await self._exit       
 
     def _update_header_token(self,token_to_update_with=False):
         if token_to_update_with:
             self.token = token_to_update_with
         self.headers = {"Authorization": "Bearer "+self.token, 
                         **HEADER_USER_AGENT}
-        print("NEW TOKEN:",self.token)
+        print("LOADING TOKEN:",self.token)
         
     def _success_code_200(self, request_test):
         if "200" in str(request_test):
@@ -93,7 +93,7 @@ class PoeApiHandler():
         return False
             
     def _authenticate(self, force_re_auth=False):
-        print("Authenticating . . . ")
+        print("Authenticating . . . ",end="")
         # test status
         if self._still_authenticated() and not force_re_auth:
             return
