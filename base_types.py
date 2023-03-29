@@ -17,5 +17,4 @@ print("done")
 
 
 if __name__ == "__main__":
-    
     print(SLOT_LOOKUP)
