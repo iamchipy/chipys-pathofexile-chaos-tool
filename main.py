@@ -1,239 +1,200 @@
-
+import asyncio
+import datetime
+import os
+import sys
+import time
+import PyQt5
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, pyqtSignal, QTimer
+import qt.main_gui
+import ctypes
 import json
-from poe_oauth import PoeApiHandler
-from base_types import SLOT_LOOKUP
-import user_info
+import lib.poepy
+import lib.user_info
+
+api:lib.poepy.PoeApiHandler
+parser:lib.poepy.DataParser
+
+# variables for searching log files to detect new zone
+modified = 0
+previous = 0
 
 
+class AsyncMainWindow(QtWidgets.QMainWindow):
+    log_timer = QTimer()
+    def __init__(self):
+        super().__init__()
+        self.init_async()
 
-class DataParser():
-    def __init__(self, api_handler:PoeApiHandler=None, league="standard") -> None:
-        if not api_handler:
-            print("API object missing. MAKE sure to use '.new_api_handler(api_handler)'")
-        self.api_handler = api_handler
+    def init_async(self):
+        print("Initializing . . . ", end="")
+        self.log_timer.timeout.connect(async_two)
+        self.log_timer.start(2000)
+        print("Started")
 
-        self.league = league
-        self.cached = {"DEFAULT_VALUE":0}
+def apply_ui_connections():
+    """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
+    Args:
+        gui_obj (gui.Ui_MainWindow): Main window GUI object
+    """
+    global gui_main, MainWindow, gui_report, reportWindow
 
-    def _cache_stash(self, league:str,force_recache:bool=False):
-        """Caches the list of tabs in a league's stash |get_leagues(self) -> list:|
-            {'id': 'fae1b5d2ef', 
-            'name': 'Heist (Remove-only)', 
-            'type': 'NormalStash', 
-            'index': 0, 
-            'metadata': {'colour': '7c5436'}}
+    # set window icon
+    # MainWindow.setWindowIcon(QtGui.QIcon('C:\Dropbox\_SCRIPTS\chipys-5e-companion\chipys-5e-tools\chipys_5e_tools\img\Chipy128.ico'))
+    # MainWindow.setWindowIcon(QtGui.QIcon('C:\Dropbox\_SCRIPTS\chipys-5e-companion\chipys-5e-tools\chipys_5e_tools\img\ChipyLogo.png'))
+    app.setWindowIcon(QtGui.QIcon('.\img\ChipyLogo.png'))
+    MainWindow.setWindowTitle("Chipy's PoE Tools")
+    # set login icon (this is to fix the image path issue)
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap("./img/poe.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    gui_main.login_link.setIcon(icon)
 
-        Args:
-            league (str): league name as 
-        """
-        if league+"_stash_response" not in self.cached or force_recache:
-            self.cached[league+"_stash_response"] = self.api_handler.get_stash(league)
-            self.cached[league+"_stash"] = json.loads(self.cached[league+"_stash_response"].content)["stashes"]
-    
-    def _parse_tab_names(self, stash:dict, filter_remove_only=True) -> dict:
-        result = [[i["name"],i["id"]] for i in stash]
-        if filter_remove_only:
-            result = [i for i in result if "Remove-only" not in i[0]]
-        return dict(result)
-    
-    def find_tab(self, search_str:str, league:str="standard", all_matches:bool=False) -> tuple:
-        """Searches for the provided str in both tab names and IDs
+    # # link menus
+    # gui_main.actionExit.triggered.connect(lambda: app.exit())
+    # gui_main.actionProject_GitHub.triggered.connect(lambda: show_popup("Thanks for your curiosity! Please feel free to check out the project at https://github.com/iamchipy/chipys-5e-companion"))
+    # gui_main.actionChipy_Dev.triggered.connect(lambda: show_popup("Thanks for your curiosity! You can find more of my stuff at www.chipy.dev"))
 
-        Args:
-            search_str (str): Partial or complete case sensitive string to find
-            league (str, optional): League Name string. Defaults to "standard".
+    # # link buttons
+    gui_main.login_link.clicked.connect(lambda: action_login_link(gui_main))
+    gui_main.refresh_link.clicked.connect(lambda: update_unid_counts(gui_main, True))
 
-        Returns:
-            tuple: tab's (name, ID) pair
-        """
-        # first cache the data we need use
-        self._cache_stash(league)
+    gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
+    gui_main.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_main))
 
-        # set some helper to assist with matching
-        last_match = None
-        name_match = []
-        prioritize_name = len(search_str) != 10
+    # # connect listView log to click even with index
+    # gui_main.dice_log.clicked[QtCore.QModelIndex].connect(click_dice_log)
+    # gui_main.formula_log.clicked[QtCore.QModelIndex].connect(click_formula_log)
 
-        # search stashes for a match
-        for tab in self.cached[league+"_stash"]:
-            # check for any partial match
-            if search_str in tab["name"] or search_str in tab["id"]:
-                # load into variable 
-                last_match = (tab["name"],tab["id"])
-                # print("something:", last_match)
-                # full match return right away
-                if search_str == tab["name"] or search_str == tab["id"]:
-                    return last_match          
-                # store name match for priority      
-                if prioritize_name and search_str in tab["name"]:
-                    if all_matches:
-                        name_match.append((tab["name"], tab["id"]))
-                    else:
-                        name_match = (tab["name"], tab["id"])
-                    # print("nameMatch", name_match)
-        if prioritize_name:
-            # if all_matches:
-            #     return name_match
-            return name_match
-        return last_match
-       
-    def get_tab_names(self, league="standard") -> dict:
-        self._cache_stash(league)
-        self.cached[league+"_tab_names"] = self._parse_tab_names(stash=self.cached[league+"_stash"])
-        return self.cached[league+"_tab_names"]
-        
-    def _cache_tab(self, league:str, stash_id:str, force_recache:bool=False) -> dict:
-        if league+"_"+stash_id not in self.cached or force_recache:
-            self.cached[league+"_"+stash_id+"_response"] = self.api_handler.get_tab(league, stash_id)
-            raw=json.loads(self.cached[league+"_"+stash_id+"_response"].content)
-            # print(type(raw))
-            # print(type(raw["stash"]))
-            # print(type(raw["stash"]["items"]))
-            assert "children" not in raw["stash"]  # assert not a parent/nested tab
-            self.cached[league+"_"+stash_id] = raw
-        return self.cached[league+"_"+stash_id]
-
-    def _parse_item_names(self, tab:dict) -> list:
-        # print(tab)
-        # print(type(tab))
-        result = [i["name"] for i in tab["stash"]["items"]]
-        return result      
-
-    def get_item_names(self,  stash_id:str="52dc1b3814", league="hardcore") -> dict:
-        self._cache_tab(league,stash_id)
-        self.cached[league+"_"+stash_id+"_item_names"] = self._parse_item_names(self.cached[league+"_"+stash_id])
-        return self.cached[league+"_"+stash_id+"_item_names"] 
-    
-    def get_items(self, stash_id:str="52dc1b3814", league="hardcore") -> dict:
-        # handle when Stash_ID is False
-        if isinstance(stash_id, bool):
-            return False
-        # handle when Stash_ID is the name/ID tuple
-        if isinstance(stash_id,tuple) and len(stash_id)==2:
-            stash_id=stash_id[1]
-        # Handle when you are given a list of StashID
-        if isinstance(stash_id,list):
-            result_list = []
-            for stash in stash_id:
-                fetch = self.get_items(stash, league)
-                if fetch:
-                    result_list+=fetch
-            # print(result_list)
-            return result_list            
-
-        assert isinstance(stash_id,str) and len(stash_id)==10  # Assert valid stashID 
-        self._cache_tab(league,stash_id)
-        # return self.cached[league+"_"+stash_id]["stash"]["items"]
-        try:
-            return self.cached[league+"_"+stash_id]["stash"]["items"]
-        except KeyError as e:
-            print(f"Failed to get stash: {stash_id} [no key 'items' in object]")
-            return False
-    
-    def filter_identified(self, list_of_items:list) -> list:
-        return [i for i in list_of_items if i["identified"] is False]
-
-    def _cache_characters(self):
-        if "characters" not in self.cached:
-            self.cached["characters_response"] = self.api_handler.get_characters()
-            self.cached["characters"] = json.loads(self.cached["characters_response"].content)["characters"]
-
-    def _parse_character_names(self, characters):
-        result = [[i["name"],i["league"]] for i in characters]
-        return result      
-    
-    def get_characters(self) -> list:
-        self._cache_characters()
-        return self._parse_character_names(self.cached["characters"])   
-
-    def _cache_leagues(self):
-        if "leagues" not in self.cached:
-            self.cached["leagues_response"] = self.api_handler.get_leagues()
-            self.cached["leagues"] = json.loads(self.cached["leagues_response"].content)["leagues"]
-
-    def _parse_league_names(self, characters):
-        result = [i["id"] for i in characters if i["realm"] == "pc"]
-        return result  
-
-    def get_leagues(self) -> list:
-        """Base leagues:
-            - 'Standard'
-            - 'Hardcore'
-            - 'SSF Standard'
-            - 'SSF Hardcore'
-        Returns:
-            list: List of active leagues
-        """
-        self._cache_leagues()
-        return self._parse_league_names(self.cached["leagues"])
-
-def validate_league(parser:DataParser, user_input:str=None):
-    active_leagues = parser.get_leagues()
-    if not user_input:
-        print(active_leagues)
-        user_input = input("Select League: ").lower()
-    for league in active_leagues:
-        if user_input in str(league).lower():
-            print("League auto-corrected to:",league)
-            return league
-    return False
-
-def validate_tab(parser:DataParser,league_of_interest:str=None, user_input:str=None) -> tuple:
-    if not user_input:
-        print(parser.get_tab_names(league_of_interest))
-        user_input = input("Select tab: ")
-    if not league_of_interest:
-        league_of_interest =validate_league(parser)
-
-    tab = parser.find_tab(user_input, league_of_interest)
-
-    if tab:
-        print("League auto-corrected to: ",tab)
-        return tab
-    return False
-
-def count_slots(parser:DataParser, list_of_items:list):
-    counts={"Total":0}
-    for item in list_of_items:
-        if item["baseType"] not in SLOT_LOOKUP:
-            slot = "Unknown"
-        else:
-            slot = SLOT_LOOKUP[item["baseType"]]
-        if slot in counts:
-            counts[slot] +=1
-        else:
-            counts[slot] = 1
-        counts["Total"] += 1
-    
-    return counts
-
-if __name__ == "__main__":
-    authentication = PoeApiHandler(client_id=user_info.cfg["api"]["CLIENT_ID"],
-                                   client_secret=user_info.cfg["api"]["CLIENT_SECRET"],
-                                   scope=user_info.cfg["api"]["SCOPE"],
-                                   uri=user_info.cfg["api"]["REDIRECT_URI"],
-                                   manual_token=user_info.cfg["api"]["TOKEN"]
-                                   )
-    parser = DataParser(api_handler = authentication)
+def action_login_link(gui):
+    global api, parser, gui_main
+    api = lib.poepy.PoeApiHandler(client_id=lib.user_info.cfg["api"]["CLIENT_ID"],
+                                    client_secret=lib.user_info.cfg["api"]["CLIENT_SECRET"],
+                                    scope=lib.user_info.cfg["api"]["SCOPE"],
+                                    uri=lib.user_info.cfg["api"]["REDIRECT_URI"],
+                                    manual_token=lib.user_info.cfg["api"]["TOKEN"]
+                                    )
+    parser = lib.poepy.DataParser(api_handler = api)
 
     # save any token changes
-    user_info.cfg["api"]["TOKEN"] = authentication.token
-    user_info.save()
+    lib.user_info.cfg["api"]["TOKEN"] = api.token
+    lib.user_info.cfg["form"]["username"] = json.loads(api.get_profile().content)["name"]
+    lib.user_info.save()
 
-    # set league
-    league_of_interest = validate_league(parser, "st")
+    # set login name
+    gui.login_link.setText(lib.user_info.cfg["form"]["username"])
+    gui.login_link.setDisabled(True)
+    gui.select_league.setCurrentText( lib.user_info.cfg["form"]["league"])
+    gui.select_tab.setCurrentText( lib.user_info.cfg["form"]["tab"])
 
-    # tab_of_interes
-    tabs_of_interest = [validate_tab(parser, league_of_interest, "DT"),
-                        validate_tab(parser, league_of_interest, "S Cluster"),
-                        validate_tab(parser, league_of_interest, "g")]
+    # continue the loading chain
+    action_load_leagues(gui)
 
-
-    # filter for unid
-    list_of_items_unidentified = parser.filter_identified(parser.get_items(tabs_of_interest, league_of_interest))
+def action_load_leagues(gui):
+    global parser
+    leagues = parser.get_leagues()
+    # clear the box and repop
+    gui.select_league.clear()
+    gui.select_tab.clear()
+    gui.select_league.addItems(leagues)
+    # # set previous league
+    # gui_main.select_league.setCurrentText( lib.user_info.cfg["form"]["league"])
     
-    # loop and count unids
-    print(count_slots(parser, list_of_items_unidentified))
-    # print(parser.get_item_names(tab_of_interest[1],league_of_interest))
- 
+def action_set_league(gui):
+    league = gui.select_league.currentText()
+    lib.user_info.cfg["form"]["league"] = gui.select_league.currentText()
+    lib.user_info.save()    
+    action_load_tabs(gui, league)
 
+def action_load_tabs(gui, league):
+    global parser, gui_main
+    tabs = parser.get_tab_names(league).keys()
+    # clear the box and repop
+    gui.select_tab.clear()
+    gui.select_tab.addItems(tabs)
+    
+def action_set_tab(gui, force_recache:bool=False):
+    global parser, gui_main
+    lib.user_info.cfg["form"]["tab"] = gui.select_tab.currentText()
+    lib.user_info.save()
+  
+def update_unid_counts(gui, force_recache:bool=False):
+    global parser, gui_main
+    league_of_interest = gui.select_league.currentText()
+    try:
+        # tab_of_interes
+        tabs_of_interest = lib.poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
+
+        # filter for unid
+        list_of_items_unidentified = parser.filter_identified(parser.get_items(tabs_of_interest, league_of_interest, force_recache))
+        
+        # loop and count unids
+        count = lib.poepy.count_slots(parser, list_of_items_unidentified)
+        target = gui.sets_target.value()
+        # str_count = str(count.items())
+        # gui.count_report_string.setText(str_count)
+        multiplier = 100//target
+        
+        # set GUI element values
+        gui_main.count_weapons.setValue(count["Weapon"]*multiplier)
+        gui_main.count_helms.setValue(count["Helmet"]*multiplier)
+        gui_main.count_bodies.setValue(count["Body"]*multiplier)
+        gui_main.count_boots.setValue(count["Boots"]*multiplier)
+        gui_main.count_gloves.setValue(count["Gloves"]*multiplier)
+        gui_main.count_belts.setValue(count["Belt"]*multiplier)
+        gui_main.count_amulets.setValue(count["Amulet"]*multiplier)
+        gui_main.count_rings.setValue((count["Ring"]*multiplier)/2)
+    except Exception as e:
+        gui.count_report_string.setText(str(e))
+
+def async_two():
+    # Entry point to secondary exec chain
+    log_search()
+
+def log_search():
+    global modified, previous, gui_main
+    # await asyncio.sleep(1)
+    snippet = " : You have entered"
+    path = "C:\Program Files (x86)\Grinding Gear Games\Path of Exile\logs\Client.txt"
+    modified = os.path.getmtime(path)
+    if modified > previous:
+        previous = modified
+        print("Last modified: %s" % time.ctime(modified))
+        gui_main.count_report_string.setText("Reading...")
+        stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+        with open(path, "r", encoding="utf-8") as file:
+            for line in file:
+                if stamp in line:
+                    if snippet in line:
+                        print(line)
+                        gui_main.count_report_string.setText(line[78:])
+                        update_unid_counts(gui_main)
+                        return
+        gui_main.count_report_string.setText("Reading... Done")
+
+# 2023/03/30 09:11:22            
+
+if __name__ == "__main__":
+    # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon
+    # https://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7/1552105#1552105
+    myappid = u'chipy.tools.PoE' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+    # build main GUI
+    app = QtWidgets.QApplication(sys.argv)
+    # MainWindow = QtWidgets.QMainWindow()
+    MainWindow = AsyncMainWindow()
+    MainWindow.show()
+
+    gui_main = qt.main_gui.Ui_MainWindow()
+    gui_main.setupUi(MainWindow)
+
+    # Modify the gui with connections and links
+    apply_ui_connections()  # here we modify actions to the GUI
+    # init_async()
+
+
+    # action_login_link(gui_main)  # auto-login
+
+    # run app as the last thing in the script
+    sys.exit(app.exec_())
+  
