@@ -1,5 +1,5 @@
-# ignore
-private.py
+# Manually added
+*.bat
 *.cfg
 
 # Byte-compiled / optimized / DLL files
@@ -132,5 +132,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 pyproject.toml
-cpct/cpct/_build.bat
-cpct/cpct/_publish.bat
+
+

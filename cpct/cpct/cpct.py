@@ -193,6 +193,7 @@ def async_two():
     # Entry point to secondary exec chain
     log_search()
 
+@timed_try_wrapper
 def log_search():
     global modified, previous, gui_main
     # 2023/03/30 09:11     
