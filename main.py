@@ -1,16 +1,25 @@
-import asyncio
+import typing
 import datetime
 import os
 import sys
 import time
-import PyQt5
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, pyqtSignal, QTimer
+import webbrowser
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication
+from PyQt5 import QtGui
+from PyQt5.QtCore import QTimer
 import qt.main_gui
 import ctypes
 import json
 import lib.poepy
 import lib.user_info
+
+# type checking block (AND RUFF INFO)
+# https://www.youtube.com/watch?v=bcAqceZkZRQ
+if typing.TYPE_CHECKING:
+    ...
+
+# set statics
+ASYNC_INTERVAL_MS = 2000
 
 api:lib.poepy.PoeApiHandler
 parser:lib.poepy.DataParser
@@ -19,8 +28,7 @@ parser:lib.poepy.DataParser
 modified = 0
 previous = 0
 
-
-class AsyncMainWindow(QtWidgets.QMainWindow):
+class AsyncMainWindow(QMainWindow):
     log_timer = QTimer()
     def __init__(self):
         super().__init__()
@@ -29,41 +37,48 @@ class AsyncMainWindow(QtWidgets.QMainWindow):
     def init_async(self):
         print("Initializing . . . ", end="")
         self.log_timer.timeout.connect(async_two)
-        self.log_timer.start(2000)
+        self.log_timer.start(ASYNC_INTERVAL_MS)
         print("Started")
+
+def apply_ui_defaults():
+    global gui_main
+    head, filter_name = os.path.split(lib.user_info.cfg["form"]["filter_dir"])
+    gui_main.item_filter_browse.setText(filter_name)
 
 def apply_ui_connections():
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
     Args:
         gui_obj (gui.Ui_MainWindow): Main window GUI object
     """
-    global gui_main, MainWindow, gui_report, reportWindow
+    global gui_main, MainWindow
 
     # set window icon
-    # MainWindow.setWindowIcon(QtGui.QIcon('C:\Dropbox\_SCRIPTS\chipys-5e-companion\chipys-5e-tools\chipys_5e_tools\img\Chipy128.ico'))
-    # MainWindow.setWindowIcon(QtGui.QIcon('C:\Dropbox\_SCRIPTS\chipys-5e-companion\chipys-5e-tools\chipys_5e_tools\img\ChipyLogo.png'))
     app.setWindowIcon(QtGui.QIcon('.\img\ChipyLogo.png'))
     MainWindow.setWindowTitle("Chipy's PoE Tools")
+
     # set login icon (this is to fix the image path issue)
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap("./img/poe.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     gui_main.login_link.setIcon(icon)
 
     # # link menus
-    # gui_main.actionExit.triggered.connect(lambda: app.exit())
-    # gui_main.actionProject_GitHub.triggered.connect(lambda: show_popup("Thanks for your curiosity! Please feel free to check out the project at https://github.com/iamchipy/chipys-5e-companion"))
-    # gui_main.actionChipy_Dev.triggered.connect(lambda: show_popup("Thanks for your curiosity! You can find more of my stuff at www.chipy.dev"))
+    gui_main.actionChipy_dev.triggered.connect(lambda: trigger_website("chipy"))
+    gui_main.actionFilterblade_xyz.triggered.connect(lambda: trigger_website("filterblade"))
 
     # # link buttons
     gui_main.login_link.clicked.connect(lambda: action_login_link(gui_main))
     gui_main.refresh_link.clicked.connect(lambda: update_unid_counts(gui_main, True))
+    gui_main.item_filter_browse.clicked.connect(lambda: open_browser())
 
+    # Link ComboBoxes
     gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
     gui_main.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_main))
 
-    # # connect listView log to click even with index
-    # gui_main.dice_log.clicked[QtCore.QModelIndex].connect(click_dice_log)
-    # gui_main.formula_log.clicked[QtCore.QModelIndex].connect(click_formula_log)
+def trigger_website(short_name:str):
+    if short_name == "chipy":
+        webbrowser.open("www.chipy.dev/me.html")
+    if short_name == "filterblade":
+        webbrowser.open("https://www.filterblade.xyz/")        
 
 def action_login_link(gui):
     global api, parser, gui_main
@@ -152,7 +167,8 @@ def async_two():
 
 def log_search():
     global modified, previous, gui_main
-    # await asyncio.sleep(1)
+    # 2023/03/30 09:11     
+    # 2023/03/30 09:26:41 1117798968 cffb0734 [INFO Client 31504] : You have entered Aspirants' Plaza.     
     snippet = " : You have entered"
     path = "C:\Program Files (x86)\Grinding Gear Games\Path of Exile\logs\Client.txt"
     modified = os.path.getmtime(path)
@@ -163,15 +179,24 @@ def log_search():
         stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
-                if stamp in line:
-                    if snippet in line:
+                if stamp in line and snippet in line:
                         print(line)
                         gui_main.count_report_string.setText(line[78:])
                         update_unid_counts(gui_main)
                         return
         gui_main.count_report_string.setText("Reading... Done")
 
-# 2023/03/30 09:11:22            
+def open_browser():
+    global MainWindow
+    #C:\Users\chipy\Documents\My Games\Path of Exile\
+    file_dialog = QFileDialog(MainWindow)
+    file_dialog.setFileMode(QFileDialog.AnyFile)
+    file_dialog.setNameFilter("Item Filter (*.filter)")
+    file_dialog.setDirectory(lib.user_info.cfg["form"]["filter_dir"])
+    
+    if file_dialog.exec_():
+        lib.user_info.cfg["form"]["filter_dir"] = file_dialog.selectedFiles()[0]
+        lib.user_info.save()
 
 if __name__ == "__main__":
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon
@@ -180,20 +205,15 @@ if __name__ == "__main__":
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # build main GUI
-    app = QtWidgets.QApplication(sys.argv)
-    # MainWindow = QtWidgets.QMainWindow()
+    app = QApplication(sys.argv)
     MainWindow = AsyncMainWindow()
     MainWindow.show()
-
     gui_main = qt.main_gui.Ui_MainWindow()
     gui_main.setupUi(MainWindow)
 
     # Modify the gui with connections and links
     apply_ui_connections()  # here we modify actions to the GUI
-    # init_async()
-
-
-    # action_login_link(gui_main)  # auto-login
+    apply_ui_defaults()  # set default values for the form when it's made
 
     # run app as the last thing in the script
     sys.exit(app.exec_())
