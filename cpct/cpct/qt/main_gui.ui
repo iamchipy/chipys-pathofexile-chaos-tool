@@ -534,6 +534,12 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="value">
      <number>8</number>
     </property>

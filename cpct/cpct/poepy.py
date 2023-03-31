@@ -411,14 +411,19 @@ def validate_tab(parser:DataParser,
         return tab
     return False
 
-def count_slots(parser:DataParser, list_of_items:list):
-    counts={"Total":0}
+def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=False):
+    counts={"Total":0,
+            "Weapon":0,
+            "Helmet":0,
+            "Body":0,
+            "Boots":0,
+            "Gloves":0,
+            "Belt":0,
+            "Amulet":0,
+            "Ring":0}
     for item in list_of_items:
         slot = SLOT_LOOKUP.get(item["baseType"], "Unknown")
-        if slot in counts:
+        if slot in counts or include_all_unid:
             counts[slot] +=1
-        else:
-            counts[slot] = 1
-        counts["Total"] += 1
-    
+            counts["Total"] += 1      
     return counts

@@ -136,7 +136,9 @@ def action_login_link(gui):
     # save any token changes
     user_info.set("api","TOKEN", api.token)
     user_info.set("form","username", parser.get_username())
-    gui_main.client_secret_input.isEnabled = False
+    # gui_main.client_secret_input.isEnabled = False
+    gui_main.client_secret_input.setEnabled(False)
+
 
     # set login name
     gui.login_link.setText(user_info.get("form","username"))
@@ -187,11 +189,12 @@ def update_unid_counts(gui, force_recache:bool=False):
         
         # loop and count unids
         count = poepy.count_slots(parser, list_of_items_unidentified)
+        gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
+
+        # Set scales and mutlipliers
         target = gui.sets_target.value()
-        # str_count = str(count.items())
-        # gui.count_report_string.setText(str_count)
         multiplier = 100//target
-        
+
         # set GUI element values
         gui_main.count_weapons.setValue(count["Weapon"]*multiplier)
         gui_main.count_helms.setValue(count["Helmet"]*multiplier)
@@ -200,9 +203,9 @@ def update_unid_counts(gui, force_recache:bool=False):
         gui_main.count_gloves.setValue(count["Gloves"]*multiplier)
         gui_main.count_belts.setValue(count["Belt"]*multiplier)
         gui_main.count_amulets.setValue(count["Amulet"]*multiplier)
-        gui_main.count_rings.setValue((count["Ring"]*multiplier)/2)
+        gui_main.count_rings.setValue((count["Ring"]*multiplier)//2)
     except Exception as e:
-        gui.count_report_string.setText(str(e))
+        gui.count_report_string.setText("ERR:"+str(e))
 
 def async_two():
     # Entry point to secondary exec chain
@@ -257,6 +260,9 @@ def receive_client_secret(gui):
     user_info.set("api","client_secret",gui_main.client_secret_input.text())
 
 if __name__ == "__main__":
+    # load user file
+    user_info.load()
+
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon
     # https://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7/1552105#1552105
     myappid = u'chipy.PoE.chaos.tool' # arbitrary string

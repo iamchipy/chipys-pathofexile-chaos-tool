@@ -34,9 +34,6 @@ def set(section:str, key:str, value:str):
     cfg[section][key] = value
     save()
 
-# load base info
-load()
-
 if __name__ == "__main__":
     print(get("api","client_id"))
     load()
