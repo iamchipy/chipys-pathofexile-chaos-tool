@@ -15,6 +15,7 @@ def load():
     # Set deafults
     cfg["form"] = {"filter_dir": os.path.expanduser("~/Documents")+"/My Games/Path of Exile/",
                    "filter_name":"Browse To Select",
+                   "client_path":"Browse To Select",
                    "username":"",
                    "league":"",
                    "tab":""}
@@ -27,7 +28,7 @@ def load():
     cfg.read(CFG_FILENAME)
 
 def get(section:str, key:str) -> str:
-    return cfg.get(section, key,fallback="MISSING")
+    return cfg.get(section, key, fallback="MISSING")
 
 def set(section:str, key:str, value:str):
     cfg[section][key] = value

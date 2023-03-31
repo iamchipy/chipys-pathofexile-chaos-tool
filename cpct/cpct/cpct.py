@@ -48,7 +48,7 @@ def try_wrapper(function):
         try:
             return function(*args, **kwargs)
         except Exception as e:
-            print(function.__name__, "=>FAILED:", e)
+            print(function.__name__, "=> FAILED:", e)
             return False
     return wrapper  
 
@@ -62,18 +62,19 @@ def timed_try_wrapper(function):
         try:
             result = function(*args, **kwargs)
             end = time.time()
-            print(function.__name__, "=>RunTime:",end-start)
+            print(function.__name__, "=> RunTime:",end-start)
             return result
         except Exception as e:
             end = time.time()
-            print(function.__name__, "=>FAILED:",end-start, e)
+            print(function.__name__, "=> FAILED:",end-start, e)
             result = False
     return wrapper    
 
 def apply_ui_defaults():
     global gui_main
-    gui_main.item_filter_browse.setText(os.path.split(user_info.cfg["form"]["filter_name"])[1])
+    gui_main.item_filter_browse.setText(os.path.split(user_info.get("form", "filter_name"))[1])
     gui_main.client_secret_input.setText(user_info.get("api","client_secret"))
+    gui_main.client_path_browse.setText(user_info.get("form", "client_path")[0:22]+"..."+user_info.get("form", "client_path")[-13:])
 
 def apply_ui_connections():
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
@@ -84,7 +85,7 @@ def apply_ui_connections():
     global gui_main, MainWindow
 
     # set window Icons
-    app.setWindowIcon(QtGui.QIcon('./cpct/cpct\img\ChipyLogo.png'))
+    app.setWindowIcon(QtGui.QIcon('./cpct/cpct/img/ChipyLogo.png'))
     MainWindow.setWindowTitle("Chipy's PoE Chaos Tool")
     
     # set login icon (this is to fix the image path issue)
@@ -111,7 +112,8 @@ def apply_ui_connections():
     # # link buttons
     gui_main.login_link.clicked.connect(lambda: action_login_link(gui_main))
     gui_main.refresh_link.clicked.connect(lambda: update_unid_counts(gui_main, True))
-    gui_main.item_filter_browse.clicked.connect(lambda: open_browser(gui_main))
+    gui_main.item_filter_browse.clicked.connect(lambda: browser_item_filters(gui_main))
+    gui_main.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_main))
 
     # Link ComboBoxes
     gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
@@ -212,7 +214,7 @@ def log_search():
     # 2023/03/30 09:11     
     # 2023/03/30 09:26:41 1117798968 cffb0734 [INFO Client 31504] : You have entered Aspirants' Plaza.     
     snippet = " : You have entered"
-    path = "C:\Program Files (x86)\Grinding Gear Games\Path of Exile\logs\Client.txt"
+    path = user_info.get("form","client_path") + "\logs\Client.txt"
     modified = os.path.getmtime(path)
     if modified > previous:
         previous = modified
@@ -229,7 +231,7 @@ def log_search():
         gui_main.count_report_string.setText("Reading... Done")
 
 @timed_try_wrapper
-def open_browser(gui):
+def browser_item_filters(gui):
     global MainWindow, gui_main
     #C:\Users\chipy\Documents\My Games\Path of Exile\
     file_dialog = QFileDialog(MainWindow)
@@ -242,10 +244,17 @@ def open_browser(gui):
         user_info.set("form", "filter_name", path)
         gui.item_filter_browse.setText(os.path.split(path)[1])
 
+@timed_try_wrapper
+def browser_client_folder(gui):
+    global MainWindow, gui_main
+    file_dialog = QFileDialog(MainWindow)
+    path = file_dialog.getExistingDirectory(MainWindow, "Select 'Path of Exile' Folder", "C:\Program Files (x86)\Grinding Gear Games")
+    user_info.set("form", "client_path", path)
+    gui_main.client_path_browse.setText(path[0:22]+"..."+path[-13:])
+    
 def receive_client_secret(gui):
     global gui_main
     user_info.set("api","client_secret",gui_main.client_secret_input.text())
-
 
 if __name__ == "__main__":
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon

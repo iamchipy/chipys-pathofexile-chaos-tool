@@ -9,7 +9,7 @@ installDependencyMessage = ""
 dependenciesInstall = ["requests","PyQt5", "websockets"]
 
 # List of packages to update with pip
-dependenciesUpdate = [""]
+dependenciesUpdate = ["PyQt5"]
 
 # Make sure pip is updated
 print("Checking pip is updated...")
