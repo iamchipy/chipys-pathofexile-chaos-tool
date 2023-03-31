@@ -1,7 +1,6 @@
 import sys
 import subprocess
 
-
 SCRIPT_NAME = "Chipy's PathOfExile Chaos Tool"
 installDependencyErrors = 0
 installDependencyMessage = ""
@@ -16,9 +15,9 @@ dependenciesUpdate = [""]
 print("Checking pip is updated...")
 try:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-except:
+except Exception as e:
     error = "ERROR: Unable to update pip."
-    print(error)
+    print(error, e)
     installDependencyMessage += f"    - {error}\n"
     installDependencyErrors += 1
 
@@ -27,9 +26,9 @@ for dependency in dependenciesInstall:
     print(f"\nInstalling {dependency}...")
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", dependency])
-    except:
+    except Exception as e:
         error = f"ERROR: Unable to install {dependency}."
-        print(error)
+        print(error, e)
         installDependencyMessage += f"    - {error}\n"
         installDependencyErrors += 1
 
@@ -38,9 +37,9 @@ for dependency in dependenciesUpdate:
     print(f"\nUpdating {dependency}...")
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", dependency])
-    except:
+    except Exception as e:
         error = f"ERROR: Unable to update {dependency}."
-        print(error)
+        print(error, e)
         installDependencyMessage += f"    - {error}\n"
         installDependencyErrors += 1
 
