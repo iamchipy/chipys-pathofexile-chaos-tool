@@ -46,7 +46,7 @@ for dependency in dependenciesUpdate:
 
 if installDependencyErrors == 0:
     # Print finished with no errors
-    print(f"\n\nPython Dependencies for {SCRIPT_NAME} successfully installed.\n\nYou can now run the main program with:\n    python main.py\n\nOr by double clicking on _START_HERE.bat\n")
+    print(f"\n\nPython Dependencies for {SCRIPT_NAME} successfully installed.\n\nYou can now run the main program with:\n    python main.py\n\nOr by double clicking on _START_HERE\n")
     input("Press Enter to close this window...")
 else:
     # Report the errors found
