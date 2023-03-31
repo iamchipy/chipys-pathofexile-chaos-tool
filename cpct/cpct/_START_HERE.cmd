@@ -1,4 +1,4 @@
 REM pip install cpct --upgrade -t c:/chipy-scripts/
-REM c:\chipy-scripts\cpct\_START_HERE.cmd
-python cpct.py
+REM c:\chipy-scripts\cpct\cpct.py
+python c:\chipy-scripts\cpct\cpct.py
 pause

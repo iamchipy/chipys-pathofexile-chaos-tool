@@ -39,7 +39,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>../img/poe.png</normaloff>../img/poe.png</iconset>
+      <normaloff>../../../../chipys_pathofexile_chaos_tool/cpct/cpct/img/poe.png</normaloff>../../../../chipys_pathofexile_chaos_tool/cpct/cpct/img/poe.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -171,7 +171,7 @@
     </property>
     <property name="icon">
      <iconset theme="refresh">
-      <normaloff>.</normaloff>.</iconset>
+      <normaloff>../../../../chipys_pathofexile_chaos_tool/cpct/cpct/qt</normaloff>../../../../chipys_pathofexile_chaos_tool/cpct/cpct/qt</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -752,10 +752,8 @@
    </property>
    <widget class="QMenu" name="menuLinks">
     <property name="title">
-     <string>Links</string>
+     <string>Community Tools</string>
     </property>
-    <addaction name="actionChipy_dev"/>
-    <addaction name="separator"/>
     <addaction name="actionPathOfExile_com"/>
     <addaction name="actionPathOfBuilding_com"/>
     <addaction name="actionCraftOfExile_com"/>
@@ -772,8 +770,16 @@
     </property>
     <addaction name="actionInput_ClientSecret"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="actionChipy_dev"/>
+    <addaction name="actionGitHub"/>
+   </widget>
    <addaction name="menuSettings"/>
    <addaction name="menuLinks"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionFilterblade_xyz">
@@ -827,8 +833,16 @@
    </property>
   </action>
   <action name="actionInput_ClientSecret">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Input ClientSecret</string>
+   </property>
+  </action>
+  <action name="actionGitHub">
+   <property name="text">
+    <string>GitHub</string>
    </property>
   </action>
  </widget>

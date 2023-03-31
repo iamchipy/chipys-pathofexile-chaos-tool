@@ -15,6 +15,8 @@
 
 ```console
 pip install cpct
+OR
+pip install cpct --upgrade -t c:/chipy-scripts/
 ```
 # DISCLAIMER:
 This product isn't affiliated with or endorsed by Grinding Gear Games in any way.

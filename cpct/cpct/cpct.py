@@ -39,6 +39,19 @@ class AsyncMainWindow(QMainWindow):
         self.log_timer.start(ASYNC_INTERVAL_MS)
         print("Started")
 
+def try_wrapper(function):
+    """Simple wrapper that includes a TRY loop
+    Args:
+        function (Func): Returns the provided function wrapped Try
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except Exception as e:
+            print(function.__name__, "=>FAILED:", e)
+            return False
+    return wrapper  
+
 def timed_try_wrapper(function):
     """Simple timing wrapper that also includes a TRY loop
     Args:
@@ -59,8 +72,7 @@ def timed_try_wrapper(function):
 
 def apply_ui_defaults():
     global gui_main
-    head, filter_name = os.path.split(user_info.cfg["form"]["filter_name"])
-    gui_main.item_filter_browse.setText(filter_name)
+    gui_main.item_filter_browse.setText(os.path.split(user_info.cfg["form"]["filter_name"])[1])
     gui_main.client_secret_input.setText(user_info.get("api","client_secret"))
 
 def apply_ui_connections():
@@ -82,6 +94,7 @@ def apply_ui_connections():
 
     # # link menus
     gui_main.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
+    gui_main.actionGitHub.triggered.connect(lambda: webbrowser.open("https://github.com/iamchipy/chipys-pathofexile-chaos-tool/tree/main/cpct"))
     gui_main.actionFilterblade_xyz.triggered.connect(lambda: webbrowser.open("https://www.filterblade.xyz/") )
     gui_main.actionCraftOfExile_com.triggered.connect(lambda: webbrowser.open("https://www.craftofexile.com/en/") )
     gui_main.actionMap_RegEx.triggered.connect(lambda: webbrowser.open("https://poe.re/#/maps") )
@@ -98,7 +111,7 @@ def apply_ui_connections():
     # # link buttons
     gui_main.login_link.clicked.connect(lambda: action_login_link(gui_main))
     gui_main.refresh_link.clicked.connect(lambda: update_unid_counts(gui_main, True))
-    gui_main.item_filter_browse.clicked.connect(lambda: open_browser())
+    gui_main.item_filter_browse.clicked.connect(lambda: open_browser(gui_main))
 
     # Link ComboBoxes
     gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
@@ -107,7 +120,7 @@ def apply_ui_connections():
     # Link Text
     gui_main.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_main))
 
-# @timed_try_wrapper
+@timed_try_wrapper
 def action_login_link(gui):
     global api, parser, gui_main
     api = poepy.PoeApiHandler(client_id=user_info.cfg["api"]["CLIENT_ID"],
@@ -193,7 +206,7 @@ def async_two():
     # Entry point to secondary exec chain
     log_search()
 
-@timed_try_wrapper
+@try_wrapper
 def log_search():
     global modified, previous, gui_main
     # 2023/03/30 09:11     
@@ -215,17 +228,19 @@ def log_search():
                         return
         gui_main.count_report_string.setText("Reading... Done")
 
-def open_browser():
-    global MainWindow
+@timed_try_wrapper
+def open_browser(gui):
+    global MainWindow, gui_main
     #C:\Users\chipy\Documents\My Games\Path of Exile\
     file_dialog = QFileDialog(MainWindow)
     file_dialog.setFileMode(QFileDialog.AnyFile)
     file_dialog.setNameFilter("Item Filter (*.filter)")
-    file_dialog.setDirectory(user_info.cfg["form"]["filter_dir"])
+    file_dialog.setDirectory(user_info.get("form","filter_dir"))
     
     if file_dialog.exec_():
-        user_info.cfg["form"]["filter_name"] = file_dialog.selectedFiles()[0]
-        user_info.save()
+        path = file_dialog.selectedFiles()[0]
+        user_info.set("form", "filter_name", path)
+        gui.item_filter_browse.setText(os.path.split(path)[1])
 
 def receive_client_secret(gui):
     global gui_main
