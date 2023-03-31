@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 import websockets
 
-from lib.base_types import SLOT_LOOKUP
+from base_types import SLOT_LOOKUP
 
 HEADER_USER_AGENT ={"User-Agent": "OAuth chipytools/0.0.1 (Contact: contact@chipy.dev)"}
 HEADER_TYPE = {"Content-Type": "application/x-www-form-urlencoded"}

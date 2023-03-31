@@ -9,9 +9,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QTimer
 import qt.main_gui
 import ctypes
-import json
-import lib.poepy
-import lib.user_info
+import poepy
+import user_info
 
 # type checking block (AND RUFF INFO)
 # https://www.youtube.com/watch?v=bcAqceZkZRQ
@@ -21,8 +20,8 @@ if typing.TYPE_CHECKING:
 # set statics
 ASYNC_INTERVAL_MS = 2000
 
-api:lib.poepy.PoeApiHandler
-parser:lib.poepy.DataParser
+api:poepy.PoeApiHandler
+parser:poepy.DataParser
 
 # variables for searching log files to detect new zone
 modified = 0
@@ -60,9 +59,9 @@ def timed_try_wrapper(function):
 
 def apply_ui_defaults():
     global gui_main
-    head, filter_name = os.path.split(lib.user_info.cfg["form"]["filter_name"])
+    head, filter_name = os.path.split(user_info.cfg["form"]["filter_name"])
     gui_main.item_filter_browse.setText(filter_name)
-    gui_main.client_secret_input.setText(lib.user_info.get("api","client_secret"))
+    gui_main.client_secret_input.setText(user_info.get("api","client_secret"))
 
 def apply_ui_connections():
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
@@ -111,24 +110,24 @@ def apply_ui_connections():
 # @timed_try_wrapper
 def action_login_link(gui):
     global api, parser, gui_main
-    api = lib.poepy.PoeApiHandler(client_id=lib.user_info.cfg["api"]["CLIENT_ID"],
-                                    client_secret=lib.user_info.cfg["api"]["CLIENT_SECRET"],
-                                    scope=lib.user_info.cfg["api"]["SCOPE"],
-                                    uri=lib.user_info.cfg["api"]["REDIRECT_URI"],
-                                    manual_token=lib.user_info.cfg["api"]["TOKEN"]
+    api = poepy.PoeApiHandler(client_id=user_info.cfg["api"]["CLIENT_ID"],
+                                    client_secret=user_info.cfg["api"]["CLIENT_SECRET"],
+                                    scope=user_info.cfg["api"]["SCOPE"],
+                                    uri=user_info.cfg["api"]["REDIRECT_URI"],
+                                    manual_token=user_info.cfg["api"]["TOKEN"]
                                     )
-    parser = lib.poepy.DataParser(api_handler = api)
+    parser = poepy.DataParser(api_handler = api)
 
     # save any token changes
-    lib.user_info.set("api","TOKEN", api.token)
-    lib.user_info.set("form","username", parser.get_username())
+    user_info.set("api","TOKEN", api.token)
+    user_info.set("form","username", parser.get_username())
     gui_main.client_secret_input.isEnabled = False
 
     # set login name
-    gui.login_link.setText(lib.user_info.get("form","username"))
+    gui.login_link.setText(user_info.get("form","username"))
     gui.login_link.setDisabled(True)
-    gui.select_league.setCurrentText( lib.user_info.get("form","league"))
-    gui.select_tab.setCurrentText( lib.user_info.get("form","tab"))
+    gui.select_league.setCurrentText( user_info.get("form","league"))
+    gui.select_tab.setCurrentText( user_info.get("form","tab"))
 
     # continue the loading chain
     action_load_leagues(gui)
@@ -141,12 +140,12 @@ def action_load_leagues(gui):
     gui.select_tab.clear()
     gui.select_league.addItems(leagues)
     # # set previous league
-    # gui_main.select_league.setCurrentText( lib.user_info.cfg["form"]["league"])
+    # gui_main.select_league.setCurrentText( user_info.cfg["form"]["league"])
     
 def action_set_league(gui):
     league = gui.select_league.currentText()
-    lib.user_info.cfg["form"]["league"] = gui.select_league.currentText()
-    lib.user_info.save()    
+    user_info.cfg["form"]["league"] = gui.select_league.currentText()
+    user_info.save()    
     action_load_tabs(gui, league)
 
 def action_load_tabs(gui, league):
@@ -158,21 +157,21 @@ def action_load_tabs(gui, league):
     
 def action_set_tab(gui, force_recache:bool=False):
     global parser, gui_main
-    lib.user_info.cfg["form"]["tab"] = gui.select_tab.currentText()
-    lib.user_info.save()
+    user_info.cfg["form"]["tab"] = gui.select_tab.currentText()
+    user_info.save()
   
 def update_unid_counts(gui, force_recache:bool=False):
     global parser, gui_main
     league_of_interest = gui.select_league.currentText()
     try:
         # tab_of_interes
-        tabs_of_interest = lib.poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
+        tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
 
         # filter for unid
         list_of_items_unidentified = parser.filter_identified(parser.get_items(tabs_of_interest, league_of_interest, force_recache))
         
         # loop and count unids
-        count = lib.poepy.count_slots(parser, list_of_items_unidentified)
+        count = poepy.count_slots(parser, list_of_items_unidentified)
         target = gui.sets_target.value()
         # str_count = str(count.items())
         # gui.count_report_string.setText(str_count)
@@ -221,15 +220,15 @@ def open_browser():
     file_dialog = QFileDialog(MainWindow)
     file_dialog.setFileMode(QFileDialog.AnyFile)
     file_dialog.setNameFilter("Item Filter (*.filter)")
-    file_dialog.setDirectory(lib.user_info.cfg["form"]["filter_dir"])
+    file_dialog.setDirectory(user_info.cfg["form"]["filter_dir"])
     
     if file_dialog.exec_():
-        lib.user_info.cfg["form"]["filter_name"] = file_dialog.selectedFiles()[0]
-        lib.user_info.save()
+        user_info.cfg["form"]["filter_name"] = file_dialog.selectedFiles()[0]
+        user_info.save()
 
 def receive_client_secret(gui):
     global gui_main
-    lib.user_info.set("api","client_secret",gui_main.client_secret_input.text())
+    user_info.set("api","client_secret",gui_main.client_secret_input.text())
 
 
 if __name__ == "__main__":

@@ -132,3 +132,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 pyproject.toml
+cpct/cpct/_build.bat
+cpct/cpct/_publish.bat
