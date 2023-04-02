@@ -18,14 +18,16 @@ if typing.TYPE_CHECKING:
     ...
 
 # set statics
-ASYNC_INTERVAL_MS = 2000
+ASYNC_INTERVAL_MS = 1000
 
 api:poepy.PoeApiHandler
 parser:poepy.DataParser
 
 # variables for searching log files to detect new zone
 modified = 0
+async_time = time.time()
 previous = 0
+refresh_off_cooldown = True
 
 class AsyncMainWindow(QMainWindow):
     log_timer = QTimer()
@@ -92,7 +94,17 @@ def apply_ui_connections():
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap("./cpct/cpct/img/poe.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     gui_main.login_link.setIcon(icon)
-
+    icon.addPixmap(QtGui.QPixmap("./cpct/cpct/img/dropper.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    gui_main.color_link_rings.setIcon(icon)
+    gui_main.color_link_amulets.setIcon(icon)
+    gui_main.color_link_belts.setIcon(icon)
+    gui_main.color_link_bodies.setIcon(icon)
+    gui_main.color_link_boots.setIcon(icon)
+    gui_main.color_link_helmets.setIcon(icon)
+    gui_main.color_link_legs.setIcon(icon)
+    gui_main.color_link_weapons.setIcon(icon)
+    gui_main.color_link_gloves.setIcon(icon)
+    
     # # link menus
     gui_main.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
     gui_main.actionGitHub.triggered.connect(lambda: webbrowser.open("https://github.com/iamchipy/chipys-pathofexile-chaos-tool/tree/main/cpct"))
@@ -152,18 +164,28 @@ def action_login_link(gui):
 def action_load_leagues(gui):
     global parser
     leagues = parser.get_leagues()
+
     # clear the box and repop
     gui.select_league.clear()
     gui.select_tab.clear()
     gui.select_league.addItems(leagues)
-    # # set previous league
-    # gui_main.select_league.setCurrentText( user_info.cfg["form"]["league"])
+
+    # set previous league
+    gui_main.select_league.setCurrentText(user_info.get("form","league"))
     
 def action_set_league(gui):
+    # load current selection for league
     league = gui.select_league.currentText()
-    user_info.cfg["form"]["league"] = gui.select_league.currentText()
-    user_info.save()    
-    action_load_tabs(gui, league)
+    # print("League:",league)
+    if league != "":
+        try:
+            previous = user_info.get("form", "league")
+            # print("previous:",previous)
+            action_load_tabs(gui, previous)
+        except Exception as e:
+            print("action_set_league::>",e)
+            user_info.set("form", "league",gui.select_league.currentText()) 
+            action_load_tabs(gui, league)
 
 def action_load_tabs(gui, league):
     global parser, gui_main
@@ -178,8 +200,10 @@ def action_set_tab(gui, force_recache:bool=False):
     user_info.save()
   
 def update_unid_counts(gui, force_recache:bool=False):
-    global parser, gui_main
+    global parser, gui_main, refresh_off_cooldown
     league_of_interest = gui.select_league.currentText()
+    refresh_off_cooldown = False
+    gui_main.refresh_link.setEnabled(refresh_off_cooldown)
     try:
         # tab_of_interes
         tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
@@ -189,7 +213,7 @@ def update_unid_counts(gui, force_recache:bool=False):
         
         # loop and count unids
         count = poepy.count_slots(parser, list_of_items_unidentified)
-        gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
+        # gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
 
         # Set scales and mutlipliers
         target = gui.sets_target.value()
@@ -208,11 +232,25 @@ def update_unid_counts(gui, force_recache:bool=False):
         gui.count_report_string.setText("ERR:"+str(e))
 
 def async_two():
+    global refresh_off_cooldown, gui_main, async_time
+    elapsed = time.time() - async_time
+    print("a",elapsed)
     # Entry point to secondary exec chain
     log_search()
-
+    # Trigger only every 5 sec
+    if elapsed>5000:
+        print("e",elapsed)
+        if not refresh_off_cooldown:
+            refresh_off_cooldown = True 
+            gui_main.refresh_link.setEnabled(refresh_off_cooldown)
+    if elapsed > 10000:
+        async_time = time.time()
+        print("r",elapsed)
+        
 @try_wrapper
 def log_search():
+    """Checks the ClientLog for a maching zone change with timestamp in the current minute
+    """
     global modified, previous, gui_main
     # 2023/03/30 09:11     
     # 2023/03/30 09:26:41 1117798968 cffb0734 [INFO Client 31504] : You have entered Aspirants' Plaza.     
@@ -221,8 +259,8 @@ def log_search():
     modified = os.path.getmtime(path)
     if modified > previous:
         previous = modified
-        print("Last modified: %s" % time.ctime(modified))
-        gui_main.count_report_string.setText("Reading...")
+        # print("Last modified: %s" % time.ctime(modified))
+        # gui_main.count_report_string.setText("Reading...")
         stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
@@ -231,7 +269,7 @@ def log_search():
                         gui_main.count_report_string.setText(line[78:])
                         update_unid_counts(gui_main)
                         return
-        gui_main.count_report_string.setText("Reading... Done")
+        # gui_main.count_report_string.setText("Reading... Done")
 
 @timed_try_wrapper
 def browser_item_filters(gui):
@@ -270,6 +308,7 @@ if __name__ == "__main__":
 
     # build main GUI
     app = QApplication(sys.argv)
+    app.setStyle('Fusion')
     MainWindow = AsyncMainWindow()
     MainWindow.show()
     gui_main = qt.main_gui.Ui_MainWindow()

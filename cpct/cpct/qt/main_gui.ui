@@ -6,20 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
+    <width>717</width>
     <height>357</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Roboto</family>
+   </font>
+  </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Chipys PathOfExile Choas Tool</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <widget class="QCommandLinkButton" name="login_link">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>-5</y>
-      <width>261</width>
+      <width>241</width>
       <height>51</height>
      </rect>
     </property>
@@ -149,10 +160,10 @@
    <widget class="QCommandLinkButton" name="refresh_link">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>0</y>
+      <x>240</x>
+      <y>-5</y>
       <width>91</width>
-      <height>41</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -186,7 +197,7 @@
    <widget class="QProgressBar" name="count_weapons">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>10</y>
       <width>271</width>
       <height>23</height>
@@ -198,33 +209,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>10</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Weapons</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_helms">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>40</y>
       <width>271</width>
       <height>23</height>
@@ -236,52 +238,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>40</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Helms</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>100</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Legs</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_bodies">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>70</y>
       <width>271</width>
       <height>23</height>
@@ -293,33 +267,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>70</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Bodies</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_legs">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>100</y>
       <width>271</width>
       <height>23</height>
@@ -331,33 +296,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>160</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Gloves</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_amulets">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>220</y>
       <width>271</width>
       <height>23</height>
@@ -369,33 +325,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>190</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Belts</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_boots">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>130</y>
       <width>271</width>
       <height>23</height>
@@ -407,33 +354,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>130</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Boots</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_gloves">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>160</y>
       <width>271</width>
       <height>23</height>
@@ -445,14 +383,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_belts">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>190</y>
       <width>271</width>
       <height>23</height>
@@ -464,52 +412,24 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>220</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Amulets</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_12">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>250</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Rings</string>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="count_rings">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>340</x>
       <y>250</y>
       <width>271</width>
       <height>23</height>
@@ -521,8 +441,19 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}
+QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 6px;
+}</string>
+    </property>
     <property name="value">
-     <number>0</number>
+     <number>25</number>
     </property>
    </widget>
    <widget class="QSpinBox" name="sets_target">
@@ -784,13 +715,562 @@
      <string>PoE Folder:</string>
     </property>
    </widget>
+   <widget class="QCommandLinkButton" name="color_link_rings">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>240</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Rings</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_amulets">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>210</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Amulets</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_belts">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>180</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Belts</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_gloves">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>150</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Gloves</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_helmets">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>30</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Helmets</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_legs">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>90</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Legs</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_bodies">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>60</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Bodies</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_boots">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>120</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Boots</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_weapons">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>0</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Weapons</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
+     <width>717</width>
      <height>21</height>
     </rect>
    </property>
@@ -890,7 +1370,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="color-picker-dropper-colour-svgrepo-com.svg"/>
+ </resources>
  <connections/>
  <buttongroups>
   <buttongroup name="recipe_type"/>
