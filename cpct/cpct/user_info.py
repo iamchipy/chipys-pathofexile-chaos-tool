@@ -18,7 +18,18 @@ def load():
                    "client_path":"Browse To Select",
                    "username":"",
                    "league":"",
-                   "tab":""}
+                   "tab":"",
+                   "color_weapons":"#457dff",
+                   "color_helmets":"#457dff",
+                   "color_gloves":"#457dff",
+                   "color_legs":"#457dff",
+                   "color_rings":"#457dff",
+                   "color_amulets":"#457dff",
+                   "color_bodies":"#457dff",
+                   "color_boots":"#457dff",
+                   }
+
+
     cfg["api"] = {"CLIENT_ID":"chipytools",
                   "CLIENT_SECRET":"AskChipyForThis",
                   "SCOPE":"account:profile account:characters account:stashes account:item_filter",
