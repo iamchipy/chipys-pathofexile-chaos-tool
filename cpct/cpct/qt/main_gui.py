@@ -102,15 +102,15 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_weapons.setProperty("value", 0)
+        self.count_weapons.setProperty("value", 25)
         self.count_weapons.setObjectName("count_weapons")
-        self.count_helms = QtWidgets.QProgressBar(self.centralwidget)
-        self.count_helms.setGeometry(QtCore.QRect(340, 40, 271, 23))
+        self.count_helmets = QtWidgets.QProgressBar(self.centralwidget)
+        self.count_helmets.setGeometry(QtCore.QRect(340, 40, 271, 23))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
-        self.count_helms.setFont(font)
-        self.count_helms.setStyleSheet("QProgressBar::chunk {\n"
+        self.count_helmets.setFont(font)
+        self.count_helmets.setStyleSheet("QProgressBar::chunk {\n"
 "    background-color: #05B8CC;\n"
 "    border-radius: 8px;\n"
 "}\n"
@@ -118,8 +118,8 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_helms.setProperty("value", 0)
-        self.count_helms.setObjectName("count_helms")
+        self.count_helmets.setProperty("value", 25)
+        self.count_helmets.setObjectName("count_helmets")
         self.count_bodies = QtWidgets.QProgressBar(self.centralwidget)
         self.count_bodies.setGeometry(QtCore.QRect(340, 70, 271, 23))
         font = QtGui.QFont()
@@ -134,7 +134,7 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_bodies.setProperty("value", 0)
+        self.count_bodies.setProperty("value", 25)
         self.count_bodies.setObjectName("count_bodies")
         self.count_legs = QtWidgets.QProgressBar(self.centralwidget)
         self.count_legs.setGeometry(QtCore.QRect(340, 100, 271, 23))
@@ -150,7 +150,7 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_legs.setProperty("value", 0)
+        self.count_legs.setProperty("value", 25)
         self.count_legs.setObjectName("count_legs")
         self.count_amulets = QtWidgets.QProgressBar(self.centralwidget)
         self.count_amulets.setGeometry(QtCore.QRect(340, 220, 271, 23))
@@ -166,7 +166,7 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_amulets.setProperty("value", 0)
+        self.count_amulets.setProperty("value", 25)
         self.count_amulets.setObjectName("count_amulets")
         self.count_boots = QtWidgets.QProgressBar(self.centralwidget)
         self.count_boots.setGeometry(QtCore.QRect(340, 130, 271, 23))
@@ -182,7 +182,7 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_boots.setProperty("value", 0)
+        self.count_boots.setProperty("value", 25)
         self.count_boots.setObjectName("count_boots")
         self.count_gloves = QtWidgets.QProgressBar(self.centralwidget)
         self.count_gloves.setGeometry(QtCore.QRect(340, 160, 271, 23))
@@ -198,7 +198,7 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_gloves.setProperty("value", 0)
+        self.count_gloves.setProperty("value", 25)
         self.count_gloves.setObjectName("count_gloves")
         self.count_belts = QtWidgets.QProgressBar(self.centralwidget)
         self.count_belts.setGeometry(QtCore.QRect(340, 190, 271, 23))
@@ -214,7 +214,7 @@ class Ui_MainWindow(object):
 "    text-align: center;\n"
 "    border-radius: 8px;\n"
 "}")
-        self.count_belts.setProperty("value", 0)
+        self.count_belts.setProperty("value", 25)
         self.count_belts.setObjectName("count_belts")
         self.count_rings = QtWidgets.QProgressBar(self.centralwidget)
         self.count_rings.setGeometry(QtCore.QRect(340, 250, 271, 23))
@@ -231,7 +231,7 @@ class Ui_MainWindow(object):
 "    background-color: #05B8CC;\n"
 "    border-radius: 6px;\n"
 "}")
-        self.count_rings.setProperty("value", 70)
+        self.count_rings.setProperty("value", 25)
         self.count_rings.setObjectName("count_rings")
         self.sets_target = QtWidgets.QSpinBox(self.centralwidget)
         self.sets_target.setGeometry(QtCore.QRect(280, 230, 51, 22))

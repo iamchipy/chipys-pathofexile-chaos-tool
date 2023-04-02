@@ -4,7 +4,7 @@ import os
 import sys
 import time
 import webbrowser
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication, QColorDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import QTimer
 import qt.main_gui
@@ -19,6 +19,16 @@ if typing.TYPE_CHECKING:
 
 # set statics
 ASYNC_INTERVAL_MS = 1000
+PROGRESS_BAR_STYLE = """
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}
+QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 6px;
+}
+"""
 
 api:poepy.PoeApiHandler
 parser:poepy.DataParser
@@ -78,6 +88,18 @@ def apply_ui_defaults():
     gui_main.client_secret_input.setText(user_info.get("api","client_secret"))
     gui_main.client_path_browse.setText(user_info.get("form", "client_path")[0:22]+"..."+user_info.get("form", "client_path")[-13:])
 
+    # set previous colours
+    gui_main.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
+    gui_main.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
+    gui_main.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_bodies")))
+    gui_main.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
+    gui_main.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
+    gui_main.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmets")))
+    gui_main.count_legs.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_legs")))
+    gui_main.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
+    gui_main.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
+    
+
 def apply_ui_connections():
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
     https://www.geeksforgeeks.org/function-wrappers-in-python/
@@ -104,7 +126,18 @@ def apply_ui_connections():
     gui_main.color_link_legs.setIcon(icon)
     gui_main.color_link_weapons.setIcon(icon)
     gui_main.color_link_gloves.setIcon(icon)
-    
+
+    # Link ColorPickers
+    gui_main.color_link_amulets.clicked.connect(lambda: pick_color( gui_main.count_amulets, "color_amulets"))
+    gui_main.color_link_belts.clicked.connect(lambda: pick_color( gui_main.count_belts, "color_belts"))
+    gui_main.color_link_bodies.clicked.connect(lambda: pick_color( gui_main.count_bodies, "color_bodies"))
+    gui_main.color_link_boots.clicked.connect(lambda: pick_color( gui_main.count_boots, "color_boots"))
+    gui_main.color_link_gloves.clicked.connect(lambda: pick_color( gui_main.count_gloves, "color_gloves"))
+    gui_main.color_link_helmets.clicked.connect(lambda: pick_color( gui_main.count_helmets, "color_helmets"))
+    gui_main.color_link_legs.clicked.connect(lambda: pick_color( gui_main.count_legs, "color_legs"))
+    gui_main.color_link_rings.clicked.connect(lambda: pick_color( gui_main.count_rings, "color_rings"))
+    gui_main.color_link_weapons.clicked.connect(lambda: pick_color( gui_main.count_weapons, "color_weapons"))
+
     # # link menus
     gui_main.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
     gui_main.actionGitHub.triggered.connect(lambda: webbrowser.open("https://github.com/iamchipy/chipys-pathofexile-chaos-tool/tree/main/cpct"))
@@ -133,6 +166,9 @@ def apply_ui_connections():
 
     # Link Text
     gui_main.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_main))
+
+
+    
 
 @timed_try_wrapper
 def action_login_link(gui):
@@ -221,7 +257,7 @@ def update_unid_counts(gui, force_recache:bool=False):
 
         # set GUI element values
         gui_main.count_weapons.setValue(count["Weapon"]*multiplier)
-        gui_main.count_helms.setValue(count["Helmet"]*multiplier)
+        gui_main.count_helmets.setValue(count["Helmet"]*multiplier)
         gui_main.count_bodies.setValue(count["Body"]*multiplier)
         gui_main.count_boots.setValue(count["Boots"]*multiplier)
         gui_main.count_gloves.setValue(count["Gloves"]*multiplier)
@@ -234,18 +270,15 @@ def update_unid_counts(gui, force_recache:bool=False):
 def async_two():
     global refresh_off_cooldown, gui_main, async_time
     elapsed = time.time() - async_time
-    print("a",elapsed)
     # Entry point to secondary exec chain
     log_search()
     # Trigger only every 5 sec
-    if elapsed>5000:
-        print("e",elapsed)
-        if not refresh_off_cooldown:
-            refresh_off_cooldown = True 
-            gui_main.refresh_link.setEnabled(refresh_off_cooldown)
-    if elapsed > 10000:
+    if elapsed>5 and not refresh_off_cooldown:
+        refresh_off_cooldown = True 
+        gui_main.refresh_link.setEnabled(refresh_off_cooldown)
+    if elapsed > 10:
         async_time = time.time()
-        print("r",elapsed)
+
         
 @try_wrapper
 def log_search():
@@ -296,6 +329,19 @@ def browser_client_folder(gui):
 def receive_client_secret(gui):
     global gui_main
     user_info.set("api","client_secret",gui_main.client_secret_input.text())
+
+@timed_try_wrapper
+def pick_color(target_object, save_name):
+    new_color = QColorDialog.getColor()
+    user_info.set("form",save_name,new_color.name())
+    target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
+
+def style_sheet_new_color(base_style:str,new_color:str) -> str:
+    return_string = ""
+    i = base_style.find("background-color: ")
+    current_color = base_style[i+18:i+25]
+    return_string = base_style.replace(current_color, new_color) 
+    return return_string
 
 if __name__ == "__main__":
     # load user file

@@ -223,7 +223,7 @@ QProgressBar {
      <number>25</number>
     </property>
    </widget>
-   <widget class="QProgressBar" name="count_helms">
+   <widget class="QProgressBar" name="count_helmets">
     <property name="geometry">
      <rect>
       <x>340</x>
