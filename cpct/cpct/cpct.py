@@ -288,6 +288,8 @@ def log_search():
     # 2023/03/30 09:26:41 1117798968 cffb0734 [INFO Client 31504] : You have entered Aspirants' Plaza.     
     snippet = " : You have entered"
     path = user_info.get("form","client_path") + "\logs\Client.txt"
+    if not os.path.exists(path):
+        return False
     modified = os.path.getmtime(path)
     if modified > previous:
         previous = modified
@@ -344,6 +346,7 @@ def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return_string = base_style.replace(current_color, new_color) 
     return return_string
 
+@timed_try_wrapper
 def update_item_filter(gui):
     global gui_main
     header = poepy.ITEM_FILTER_TITLE_START
