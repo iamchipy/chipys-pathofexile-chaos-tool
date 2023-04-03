@@ -4,7 +4,7 @@ import os
 import sys
 import time
 import webbrowser
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication, QColorDialog, QInputDialog, QWidget
 from PyQt5 import QtGui
 from PyQt5.QtCore import QTimer
 import qt.main_gui
@@ -96,7 +96,6 @@ def apply_ui_defaults():
     gui_main.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
     gui_main.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
     gui_main.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmets")))
-    # gui_main.count_legs.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_legs")))
     gui_main.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
     gui_main.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
 
@@ -126,7 +125,6 @@ def apply_ui_connections():
     gui_main.color_link_bodies.setIcon(icon)
     gui_main.color_link_boots.setIcon(icon)
     gui_main.color_link_helmets.setIcon(icon)
-    gui_main.color_link_legs.setIcon(icon)
     gui_main.color_link_weapons.setIcon(icon)
     gui_main.color_link_gloves.setIcon(icon)
 
@@ -153,6 +151,7 @@ def apply_ui_connections():
     gui_main.actionVorici_Calculator.triggered.connect(lambda: webbrowser.open("https://siveran.github.io/calc.html") )
     gui_main.actionAwakened_PoE_Trade.triggered.connect(lambda: webbrowser.open("https://github.com/SnosMe/awakened-poe-trade") )
     gui_main.actionPatreon.triggered.connect(lambda: webbrowser.open("https://www.patreon.com/chipysPoEChaosTool") )
+    gui_main.actionInput_ClientSecret.triggered.connect(lambda: request_client_secret() )
     
     #ClientSecrect Menu
     # gui_main.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_main) )
@@ -233,8 +232,7 @@ def action_load_tabs(gui, league):
     
 def action_set_tab(gui, force_recache:bool=False):
     global parser, gui_main
-    user_info.cfg["form"]["tab"] = gui.select_tab.currentText()
-    user_info.save()
+    user_info.set("form", "tab", gui.select_tab.currentText())
   
 def update_unid_counts(gui, force_recache:bool=False):
     global parser, gui_main, refresh_off_cooldown
@@ -387,6 +385,19 @@ def update_item_filter(gui=None):
     with open(path, "w") as f:
         f.write(prefix+current_filter)
             
+@timed_try_wrapper
+def request_client_secret():
+    global gui_main
+    promt_obj = QWidget()
+    discord_name, ok = QInputDialog.getText(promt_obj, 'Send Discord Request?', 'Please provide the Discord name (including full "name#1234") to send the secret to')
+    if ok:
+        post = poepy.request_secret(discord_name)
+        print(post)
+        if "20" in str(post):
+            gui_main.count_report_string.setText('Request has been send please look out for a friend request on Discord')
+            # QInputDialog.getText(promt_obj, 'Request Sent', 'Request has been send please look out for a friend request on Discord')
+
+
 
 if __name__ == "__main__":
     # load user file

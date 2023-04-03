@@ -42,6 +42,9 @@
       <bold>false</bold>
      </font>
     </property>
+    <property name="statusTip">
+     <string>Path of Exile sign-in (permissions to read your stash)</string>
+    </property>
     <property name="autoFillBackground">
      <bool>false</bool>
     </property>
@@ -174,6 +177,9 @@
       <bold>false</bold>
      </font>
     </property>
+    <property name="statusTip">
+     <string>Manually refresh item counts (Stash only updates after joining a new zone)</string>
+    </property>
     <property name="autoFillBackground">
      <bool>false</bool>
     </property>
@@ -281,123 +287,7 @@ QProgressBar {
      <number>25</number>
     </property>
    </widget>
-   <widget class="QProgressBar" name="count_legs">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>100</y>
-      <width>271</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Bahnschrift</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QProgressBar::chunk {
-	background-color: #05B8CC;
-	border-radius: 8px;
-}
-QProgressBar {
-	text-align: center;
-	border-radius: 8px;
-}</string>
-    </property>
-    <property name="value">
-     <number>25</number>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="count_amulets">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>220</y>
-      <width>271</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Bahnschrift</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QProgressBar::chunk {
-	background-color: #05B8CC;
-	border-radius: 8px;
-}
-QProgressBar {
-	text-align: center;
-	border-radius: 8px;
-}</string>
-    </property>
-    <property name="value">
-     <number>25</number>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="count_boots">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>130</y>
-      <width>271</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Bahnschrift</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QProgressBar::chunk {
-	background-color: #05B8CC;
-	border-radius: 8px;
-}
-QProgressBar {
-	text-align: center;
-	border-radius: 8px;
-}</string>
-    </property>
-    <property name="value">
-     <number>25</number>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="count_gloves">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>160</y>
-      <width>271</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Bahnschrift</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QProgressBar::chunk {
-	background-color: #05B8CC;
-	border-radius: 8px;
-}
-QProgressBar {
-	text-align: center;
-	border-radius: 8px;
-}</string>
-    </property>
-    <property name="value">
-     <number>25</number>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="count_belts">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -426,11 +316,98 @@ QProgressBar {
      <number>25</number>
     </property>
    </widget>
+   <widget class="QProgressBar" name="count_boots">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>100</y>
+      <width>271</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
+    <property name="value">
+     <number>25</number>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="count_gloves">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>130</y>
+      <width>271</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
+    <property name="value">
+     <number>25</number>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="count_belts">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>160</y>
+      <width>271</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk {
+	background-color: #05B8CC;
+	border-radius: 8px;
+}
+QProgressBar {
+	text-align: center;
+	border-radius: 8px;
+}</string>
+    </property>
+    <property name="value">
+     <number>25</number>
+    </property>
+   </widget>
    <widget class="QProgressBar" name="count_rings">
     <property name="geometry">
      <rect>
       <x>340</x>
-      <y>250</y>
+      <y>220</y>
       <width>271</width>
       <height>23</height>
      </rect>
@@ -470,6 +447,9 @@ QProgressBar::chunk {
       <family>Roboto</family>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="statusTip">
+     <string>Number of sets to be collecting (for show progress)</string>
     </property>
     <property name="value">
      <number>8</number>
@@ -553,6 +533,9 @@ QProgressBar::chunk {
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="statusTip">
+     <string>How to interact with filter (Disabled to leave filters alone)</string>
+    </property>
    </widget>
    <widget class="QLabel" name="item_2">
     <property name="enabled">
@@ -594,6 +577,9 @@ QProgressBar::chunk {
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="statusTip">
+     <string>Chaos Recipe: Unidentified set of all items iLevel +60</string>
+    </property>
     <property name="text">
      <string>Chaos (i60+)</string>
     </property>
@@ -622,6 +608,9 @@ QProgressBar::chunk {
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="statusTip">
+     <string>Regal Recipe: Unidentified set of all items iLevel +70</string>
+    </property>
     <property name="text">
      <string>Regal (i70+)</string>
     </property>
@@ -644,6 +633,9 @@ QProgressBar::chunk {
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="statusTip">
+     <string>Select the item filter you use or what to modify for Chaos Recipe</string>
+    </property>
     <property name="text">
      <string>Browse</string>
     </property>
@@ -656,6 +648,9 @@ QProgressBar::chunk {
       <width>241</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="statusTip">
+     <string>Your client secret, never share this!</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_13">
@@ -692,6 +687,9 @@ QProgressBar::chunk {
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="statusTip">
+     <string>Browse to your 'Path of Exile' folder install location</string>
+    </property>
     <property name="text">
      <string>Browse</string>
     </property>
@@ -716,67 +714,6 @@ QProgressBar::chunk {
     </property>
    </widget>
    <widget class="QCommandLinkButton" name="color_link_rings">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>240</y>
-      <width>101</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="sizeIncrement">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="font">
-     <font>
-      <family>Segoe UI</family>
-      <pointsize>12</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::StrongFocus</enum>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="text">
-     <string>Rings</string>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>20</width>
-      <height>20</height>
-     </size>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>1000</number>
-    </property>
-   </widget>
-   <widget class="QCommandLinkButton" name="color_link_amulets">
     <property name="geometry">
      <rect>
       <x>610</x>
@@ -814,6 +751,9 @@ QProgressBar::chunk {
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
     </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
+    </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
     </property>
@@ -821,7 +761,7 @@ QProgressBar::chunk {
      <bool>false</bool>
     </property>
     <property name="text">
-     <string>Amulets</string>
+     <string>Rings</string>
     </property>
     <property name="icon">
      <iconset>
@@ -837,7 +777,7 @@ QProgressBar::chunk {
      <number>1000</number>
     </property>
    </widget>
-   <widget class="QCommandLinkButton" name="color_link_belts">
+   <widget class="QCommandLinkButton" name="color_link_amulets">
     <property name="geometry">
      <rect>
       <x>610</x>
@@ -875,6 +815,9 @@ QProgressBar::chunk {
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
     </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
+    </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
     </property>
@@ -882,7 +825,7 @@ QProgressBar::chunk {
      <bool>false</bool>
     </property>
     <property name="text">
-     <string>Belts</string>
+     <string>Amulets</string>
     </property>
     <property name="icon">
      <iconset>
@@ -898,7 +841,7 @@ QProgressBar::chunk {
      <number>1000</number>
     </property>
    </widget>
-   <widget class="QCommandLinkButton" name="color_link_gloves">
+   <widget class="QCommandLinkButton" name="color_link_belts">
     <property name="geometry">
      <rect>
       <x>610</x>
@@ -935,6 +878,73 @@ QProgressBar::chunk {
     </property>
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Belts</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>1000</number>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="color_link_gloves">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>120</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="sizeIncrement">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
     </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
@@ -997,6 +1007,9 @@ QProgressBar::chunk {
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
     </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
+    </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
     </property>
@@ -1005,67 +1018,6 @@ QProgressBar::chunk {
     </property>
     <property name="text">
      <string>Helmets</string>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../img/dropper.png</normaloff>../img/dropper.png</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>20</width>
-      <height>20</height>
-     </size>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>1000</number>
-    </property>
-   </widget>
-   <widget class="QCommandLinkButton" name="color_link_legs">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>90</y>
-      <width>101</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="sizeIncrement">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="font">
-     <font>
-      <family>Segoe UI</family>
-      <pointsize>12</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::StrongFocus</enum>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="text">
-     <string>Legs</string>
     </property>
     <property name="icon">
      <iconset>
@@ -1119,6 +1071,9 @@ QProgressBar::chunk {
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
     </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
+    </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
     </property>
@@ -1146,7 +1101,7 @@ QProgressBar::chunk {
     <property name="geometry">
      <rect>
       <x>610</x>
-      <y>120</y>
+      <y>90</y>
       <width>101</width>
       <height>31</height>
      </rect>
@@ -1179,6 +1134,9 @@ QProgressBar::chunk {
     </property>
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
     </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
@@ -1240,6 +1198,9 @@ QProgressBar::chunk {
     </property>
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="statusTip">
+     <string>Select the base background color to use in itemFilter</string>
     </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
@@ -1361,10 +1322,10 @@ QProgressBar::chunk {
   </action>
   <action name="actionInput_ClientSecret">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Input ClientSecret</string>
+    <string>Request ClientSecret</string>
    </property>
   </action>
   <action name="actionGitHub">

@@ -4,6 +4,9 @@ import json
 import random
 import webbrowser
 from urllib.parse import parse_qs, urlparse
+from discord import TOKEN_STATIC
+from base64 import urlsafe_b64decode
+from __about__ import __version__
 
 import requests
 import websockets
@@ -490,7 +493,18 @@ def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=Fal
             counts["Total"] += 1      
     return counts
 
+def request_secret(user_name:str="Demo"):
+    try:
+        ip = requests.get("https://api.ipify.org", timeout=2).content
+        data = {"content":f"New request for ClientSecret from **'{user_name}'**@{ip}v{__version__}"}
+    except Exception as e:    # noqa: F841
+        print(e)
+        data = {"content":f"New request for ClientSecret from **'{user_name}'**v{__version__}"}
+
+    r = requests.post(urlsafe_b64decode(TOKEN_STATIC),data=data, timeout=5)
+    return r
 
 if __name__ == "__main__":
     test = ItemFilterEntry("Weapons","0 0 0 0")
     print(test.to_str())
+    request_secret("DEMO_BLEH")
