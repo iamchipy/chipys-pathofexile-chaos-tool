@@ -20,13 +20,23 @@ def load():
                    "league":"",
                    "tab":"",
                    "color_weapons":"#457dff",
+                   "color_weapons_rgb":"[200, 200, 20, 255]",
                    "color_helmets":"#457dff",
+                   "color_helmets_rgb":"[200, 200, 20, 255]",
                    "color_gloves":"#457dff",
+                   "color_gloves_rgb":"[200, 200, 20, 255]",
                    "color_legs":"#457dff",
+                   "color_legs_rgb":"[200, 200, 20, 255]",
                    "color_rings":"#457dff",
+                   "color_rings_rgb":"[200, 200, 20, 255]",
                    "color_amulets":"#457dff",
+                   "color_amulets_rgb":"[200, 200, 20, 255]",
                    "color_bodies":"#457dff",
+                   "color_bodies_rgb":"[200, 200, 20, 255]",
                    "color_boots":"#457dff",
+                   "color_boots_rgb":"[200, 200, 20, 255]",
+
+                   
                    }
 
 

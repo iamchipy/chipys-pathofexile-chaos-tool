@@ -98,8 +98,10 @@ def apply_ui_defaults():
     gui_main.count_legs.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_legs")))
     gui_main.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
     gui_main.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
-    
 
+    # defaults for item_filter modes
+    gui_main.filter_mode.addItems(["Default","FilterBlade","Custom","Disabled"])
+    
 def apply_ui_connections():
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
     https://www.geeksforgeeks.org/function-wrappers-in-python/
@@ -163,12 +165,10 @@ def apply_ui_connections():
     # Link ComboBoxes
     gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
     gui_main.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_main))
+    gui_main.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_main))
 
     # Link Text
     gui_main.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_main))
-
-
-    
 
 @timed_try_wrapper
 def action_login_link(gui):
@@ -279,7 +279,6 @@ def async_two():
     if elapsed > 10:
         async_time = time.time()
 
-        
 @try_wrapper
 def log_search():
     """Checks the ClientLog for a maching zone change with timestamp in the current minute
@@ -333,8 +332,10 @@ def receive_client_secret(gui):
 @timed_try_wrapper
 def pick_color(target_object, save_name):
     new_color = QColorDialog.getColor()
-    user_info.set("form",save_name,new_color.name())
+    user_info.set("form", save_name, new_color.name())
+    user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
     target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
+    update_item_filter()
 
 def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return_string = ""
@@ -342,6 +343,44 @@ def style_sheet_new_color(base_style:str,new_color:str) -> str:
     current_color = base_style[i+18:i+25]
     return_string = base_style.replace(current_color, new_color) 
     return return_string
+
+def update_item_filter(gui):
+    global gui_main
+    header = poepy.ITEM_FILTER_TITLE_START
+    footer = poepy.ITEM_FILTER_TITLE_END
+    path = user_info.cfg.get("form","filter_name")
+    mode = gui_main.filter_mode.currentText()
+
+    # read data
+    current_filter = ""
+    is_section_to_replace=False
+    with open(path, "r") as f:
+        for line in f:
+            if header in line:
+                is_section_to_replace = True
+            elif footer in line:
+                is_section_to_replace = False
+            if not is_section_to_replace and footer not in line:
+                current_filter += line
+
+    # append
+   
+    prefix = header
+    if "Disabled" not in mode:
+        prefix += poepy.ItemFilterEntry("Weapons",user_info.cfg.get("form","color_weapons_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Helmets",user_info.cfg.get("form","color_helmets_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Bodies",user_info.cfg.get("form","color_bodies_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Legs",user_info.cfg.get("form","color_legs_rgb")).to_str()    
+        prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Amulets",user_info.cfg.get("form","color_amulets_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Rings",user_info.cfg.get("form","color_rings_rgb")).to_str()
+    prefix += footer
+
+    # write
+    with open(path, "w") as f:
+        f.write(prefix+current_filter)
+            
 
 if __name__ == "__main__":
     # load user file

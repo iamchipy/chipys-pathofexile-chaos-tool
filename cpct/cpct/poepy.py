@@ -23,6 +23,9 @@ API_STASH = API_ENDPOINT+"stash/"
 DEPTH_ITEMS = 2
 DEPTH_STASH_NAMES = 1
 
+ITEM_FILTER_TITLE_START = "# START -- Chipy's PoE Chaos Tool\n"
+ITEM_FILTER_TITLE_END = "# END -- Chipy's PoE Chaos Tool\n"
+
 """
 PROCESS
 - Connection handler
@@ -384,6 +387,43 @@ class DataParser():
         self._cache_leagues()
         return self._parse_league_names(self.cached["leagues"])
 
+class ItemFilterEntry():
+    def __init__(self, _class:str,bg_color:str,ilvl:str=">= 60",mirror_mode:bool=None) -> None:
+        self.show = True
+        self.HasInfluence = mirror_mode
+        self.Rarity = "Rare"
+        self.Identified = False
+        self.ItemLevel = ilvl  # ">= 60"
+        self.Class = _class  # "Amulets"
+        self.Sockets = "< 6"
+        self.LinkedSockets = "< 5"
+        self.SetFontSize = 40
+        # self.SetTextColor = [255, 255, 255, 255]
+        # self.SetBorderColor = [0, 0, 0]
+        self.SetBackgroundColor = bg_color
+        # self.MinimapIcon = "2 White Star"
+        # self.CustomAlertSound = '"1maybevaluable.mp3" 300'
+        # self.PlayEffect = "Red"
+
+    def to_str(self):
+        out_str = ""
+        for key, value in self.__dict__.items():
+            # Case key = show/hide
+            if "show" in key:
+                out_line = "Show\n" if value else "Hide\n"
+            else:
+                # more fancy checking of assignment op
+                if isinstance(value,str) and any(opp in value for opp in ["<",">","="]):
+                    out_line = "\t%s %s\n" % (key, value)
+                else:
+                    out_line = "\t%s = %s\n" % (key, value)
+                    # remove list walls
+                    out_line = out_line.replace("[","")
+                    out_line = out_line.replace(",","")
+                    out_line = out_line.replace("]","")                    
+            out_str += out_line
+        return out_str
+
 def validate_league(parser:DataParser, user_input:str=None):
     active_leagues = parser.get_leagues()
     if not user_input:
@@ -427,3 +467,8 @@ def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=Fal
             counts[slot] +=1
             counts["Total"] += 1      
     return counts
+
+
+if __name__ == "__main__":
+    test = ItemFilterEntry("Weapons","0 0 0 0")
+    print(test.to_str())

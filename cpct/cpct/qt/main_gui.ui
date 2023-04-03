@@ -515,7 +515,7 @@ QProgressBar::chunk {
    </widget>
    <widget class="QLabel" name="item_1">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -537,7 +537,7 @@ QProgressBar::chunk {
    </widget>
    <widget class="QComboBox" name="filter_mode">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
