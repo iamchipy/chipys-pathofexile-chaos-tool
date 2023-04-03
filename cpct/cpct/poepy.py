@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 import websockets
 
-from base_types import SLOT_LOOKUP
+from base_types import SLOT_LOOKUP, WEAPON_LIST
 
 HEADER_USER_AGENT ={"User-Agent": "OAuth chipytools/0.0.1 (Contact: contact@chipy.dev)"}
 HEADER_TYPE = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -388,7 +388,13 @@ class DataParser():
         return self._parse_league_names(self.cached["leagues"])
 
 class ItemFilterEntry():
-    def __init__(self, _class:str,bg_color:str,ilvl:str=">= 60",mirror_mode:bool=None) -> None:
+    def __init__(self, 
+                 _class:str,
+                 bg_color:str,
+                 ilvl:str=">= 60",
+                 width:str="<= 2",
+                 height:str="<= 3" ,
+                 mirror_mode:bool=None) -> None:
         self.show = True
         self.HasInfluence = mirror_mode
         self.Rarity = "Rare"
@@ -397,6 +403,8 @@ class ItemFilterEntry():
         self.Class = _class  # "Amulets"
         self.Sockets = "< 6"
         self.LinkedSockets = "< 5"
+        self.Width = width
+        self.Height = height     
         self.SetFontSize = 40
         # self.SetTextColor = [255, 255, 255, 255]
         # self.SetBorderColor = [0, 0, 0]
@@ -404,6 +412,12 @@ class ItemFilterEntry():
         # self.MinimapIcon = "2 White Star"
         # self.CustomAlertSound = '"1maybevaluable.mp3" 300'
         # self.PlayEffect = "Red"
+
+    def _class_list_to_string(self, incoming_list:list):
+        result = ""
+        for item in incoming_list:
+            result += "\""+item+"\" "
+        return result
 
     def to_str(self):
         out_str = ""
@@ -413,14 +427,22 @@ class ItemFilterEntry():
                 out_line = "Show\n" if value else "Hide\n"
             else:
                 # more fancy checking of assignment op
-                if isinstance(value,str) and any(opp in value for opp in ["<",">","="]):
-                    out_line = "\t%s %s\n" % (key, value)
+                if isinstance(value,str):
+                    if any(op in value for op in ["<",">","="]):
+                        out_line = "\t%s %s\n" % (key, value)
+                    elif any(t in key for t in ["Class"]):
+                        if value == "Weapons":
+                            out_line = '\t%s %s\n' % (key, self._class_list_to_string(WEAPON_LIST))
+                        else:
+                            out_line = '\t%s "%s"\n' % (key, value)
+                    else:
+                        out_line = '\t%s %s\n' % (key, value)                      
                 else:
-                    out_line = "\t%s = %s\n" % (key, value)
-                    # remove list walls
-                    out_line = out_line.replace("[","")
-                    out_line = out_line.replace(",","")
-                    out_line = out_line.replace("]","")                    
+                    out_line = "\t%s %s\n" % (key, value)
+                # remove list walls
+                out_line = out_line.replace("[","")
+                out_line = out_line.replace(",","")
+                out_line = out_line.replace("]","")                    
             out_str += out_line
         return out_str
 

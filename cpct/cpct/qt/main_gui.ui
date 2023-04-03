@@ -1278,6 +1278,8 @@ QProgressBar::chunk {
     <property name="title">
      <string>Community Tools</string>
     </property>
+    <addaction name="action_NOT_AFFILIATED_WITH_ANY"/>
+    <addaction name="separator"/>
     <addaction name="actionPathOfExile_com"/>
     <addaction name="actionPathOfBuilding_com"/>
     <addaction name="actionCraftOfExile_com"/>
@@ -1300,6 +1302,7 @@ QProgressBar::chunk {
     </property>
     <addaction name="actionChipy_dev"/>
     <addaction name="actionGitHub"/>
+    <addaction name="actionPatreon"/>
    </widget>
    <addaction name="menuSettings"/>
    <addaction name="menuLinks"/>
@@ -1318,17 +1321,17 @@ QProgressBar::chunk {
   </action>
   <action name="actionPathOfExile_com">
    <property name="text">
-    <string>PathOfExile.com</string>
+    <string>Path of Exile (Official)</string>
    </property>
   </action>
   <action name="actionPathOfBuilding_com">
    <property name="text">
-    <string>PathOfBuilding.com</string>
+    <string>Path of Building</string>
    </property>
   </action>
   <action name="actionCraftOfExile_com">
    <property name="text">
-    <string>CraftOfExile.com</string>
+    <string>Craft of Exile</string>
    </property>
   </action>
   <action name="actionMap_RegEx">
@@ -1367,6 +1370,16 @@ QProgressBar::chunk {
   <action name="actionGitHub">
    <property name="text">
     <string>GitHub</string>
+   </property>
+  </action>
+  <action name="actionPatreon">
+   <property name="text">
+    <string>Patreon</string>
+   </property>
+  </action>
+  <action name="action_NOT_AFFILIATED_WITH_ANY">
+   <property name="text">
+    <string>*NOT AFFILIATED</string>
    </property>
   </action>
  </widget>

@@ -13,9 +13,15 @@ r = requests.get(item_base_types_url)
 base_type_dict = dict(json.loads(r.content))
 BASE_TYPES = dict([[base_type_dict[base_type]["name"],base_type_dict[base_type]["item_class"]] for base_type in base_type_dict if base_type_dict[base_type]["domain"] == "item"])
 SLOT_LOOKUP = dict([slot_sub(k,v) for k,v in BASE_TYPES.items()])
+# TODO reduce excess string check by narrowing down this list
+WEAPON_CLASSES = [v for v in BASE_TYPES.items() if any(item in v for item in WEAPON_LIST)]
+
 print("done")
 
 
+"""Body Armours"""
+
 if __name__ == "__main__":
-    print(SLOT_LOOKUP)
-    print(base_type_dict)
+    # print(SLOT_LOOKUP)
+    # print(base_type_dict)
+    print(WEAPON_CLASSES)

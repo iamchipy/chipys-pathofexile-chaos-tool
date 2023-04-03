@@ -25,8 +25,6 @@ def load():
                    "color_helmets_rgb":"[200, 200, 20, 255]",
                    "color_gloves":"#457dff",
                    "color_gloves_rgb":"[200, 200, 20, 255]",
-                   "color_legs":"#457dff",
-                   "color_legs_rgb":"[200, 200, 20, 255]",
                    "color_rings":"#457dff",
                    "color_rings_rgb":"[200, 200, 20, 255]",
                    "color_amulets":"#457dff",

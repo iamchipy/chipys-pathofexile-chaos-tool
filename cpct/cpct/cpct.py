@@ -11,6 +11,7 @@ import qt.main_gui
 import ctypes
 import poepy
 import user_info
+from __about__ import __version__
 
 # type checking block (AND RUFF INFO)
 # https://www.youtube.com/watch?v=bcAqceZkZRQ
@@ -95,7 +96,7 @@ def apply_ui_defaults():
     gui_main.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
     gui_main.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
     gui_main.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmets")))
-    gui_main.count_legs.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_legs")))
+    # gui_main.count_legs.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_legs")))
     gui_main.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
     gui_main.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
 
@@ -112,7 +113,7 @@ def apply_ui_connections():
 
     # set window Icons
     app.setWindowIcon(QtGui.QIcon('./cpct/cpct/img/ChipyLogo.png'))
-    MainWindow.setWindowTitle("Chipy's PoE Chaos Tool")
+    MainWindow.setWindowTitle(f"Chipy's PoE Chaos Tool (v{__version__})")
     
     # set login icon (this is to fix the image path issue)
     icon = QtGui.QIcon()
@@ -136,7 +137,6 @@ def apply_ui_connections():
     gui_main.color_link_boots.clicked.connect(lambda: pick_color( gui_main.count_boots, "color_boots"))
     gui_main.color_link_gloves.clicked.connect(lambda: pick_color( gui_main.count_gloves, "color_gloves"))
     gui_main.color_link_helmets.clicked.connect(lambda: pick_color( gui_main.count_helmets, "color_helmets"))
-    gui_main.color_link_legs.clicked.connect(lambda: pick_color( gui_main.count_legs, "color_legs"))
     gui_main.color_link_rings.clicked.connect(lambda: pick_color( gui_main.count_rings, "color_rings"))
     gui_main.color_link_weapons.clicked.connect(lambda: pick_color( gui_main.count_weapons, "color_weapons"))
 
@@ -152,6 +152,7 @@ def apply_ui_connections():
     gui_main.actionPoE_Ninja.triggered.connect(lambda: webbrowser.open("https://www.poe.ninja") )
     gui_main.actionVorici_Calculator.triggered.connect(lambda: webbrowser.open("https://siveran.github.io/calc.html") )
     gui_main.actionAwakened_PoE_Trade.triggered.connect(lambda: webbrowser.open("https://github.com/SnosMe/awakened-poe-trade") )
+    gui_main.actionPatreon.triggered.connect(lambda: webbrowser.open("https://www.patreon.com/chipysPoEChaosTool") )
     
     #ClientSecrect Menu
     # gui_main.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_main) )
@@ -240,6 +241,9 @@ def update_unid_counts(gui, force_recache:bool=False):
     league_of_interest = gui.select_league.currentText()
     refresh_off_cooldown = False
     gui_main.refresh_link.setEnabled(refresh_off_cooldown)
+
+    # TODO Auto filter reload "/itemfilter 0PKKgH0"
+
     try:
         # tab_of_interes
         tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
@@ -347,7 +351,7 @@ def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return return_string
 
 @timed_try_wrapper
-def update_item_filter(gui):
+def update_item_filter(gui=None):
     global gui_main
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
@@ -370,10 +374,9 @@ def update_item_filter(gui):
    
     prefix = header
     if "Disabled" not in mode:
-        prefix += poepy.ItemFilterEntry("Weapons",user_info.cfg.get("form","color_weapons_rgb")).to_str()
+        prefix += poepy.ItemFilterEntry("Weapons",user_info.cfg.get("form","color_weapons_rgb"),width="= 1").to_str()
         prefix += poepy.ItemFilterEntry("Helmets",user_info.cfg.get("form","color_helmets_rgb")).to_str()
-        prefix += poepy.ItemFilterEntry("Bodies",user_info.cfg.get("form","color_bodies_rgb")).to_str()
-        prefix += poepy.ItemFilterEntry("Legs",user_info.cfg.get("form","color_legs_rgb")).to_str()    
+        prefix += poepy.ItemFilterEntry("Body Armours",user_info.cfg.get("form","color_bodies_rgb")).to_str()   
         prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
         prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
         prefix += poepy.ItemFilterEntry("Amulets",user_info.cfg.get("form","color_amulets_rgb")).to_str()
