@@ -348,8 +348,6 @@ class DataParser():
     def filter_ilvl(self, list_of_items:list, ilvl:int=60) -> list:
         return [i for i in list_of_items if i["ilvl"] >= 60]
 
-
-
     def _cache_profile(self):
         if "profile" not in self.cached:
             self.cached["profile_response"] = self.api_handler.get_profile()
@@ -498,11 +496,11 @@ def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=Fal
 
 def request_secret(user_name:str="Demo"):
     try:
-        ip = requests.get("https://api.ipify.org", timeout=2).content
-        data = {"content":f"New request for ClientSecret from **'{user_name}'**@{ip}v{__version__}"}
+        ip = requests.get("https://api.ipify.org", timeout=1).content
+        data = {"content":f"New request for ClientSecret from '**{user_name}**'@{ip}v{__version__}"}
     except Exception as e:    # noqa: F841
-        print(e)
-        data = {"content":f"New request for ClientSecret from **'{user_name}'**v{__version__}"}
+        # print(e)
+        data = {"content":f"New request for ClientSecret from '**{user_name}**'v{__version__}"}
 
     r = requests.post(urlsafe_b64decode(TOKEN_STATIC),data=data, timeout=5)
     return r
