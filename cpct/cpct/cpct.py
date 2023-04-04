@@ -246,11 +246,17 @@ def update_unid_counts(gui, force_recache:bool=False):
         # tab_of_interes
         tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
 
+        # list of items
+        items_of_interest = parser.get_items(tabs_of_interest, league_of_interest, force_recache)
+
         # filter for unid
-        list_of_items_unidentified = parser.filter_identified(parser.get_items(tabs_of_interest, league_of_interest, force_recache))
+        items_unidentified = parser.filter_identified(items_of_interest)
+
+        # filter for ilevel
+        items_unidentified_ilvl = parser.filter_ilvl(items_unidentified)
         
         # loop and count unids
-        count = poepy.count_slots(parser, list_of_items_unidentified)
+        count = poepy.count_slots(parser, items_unidentified_ilvl)
         # gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
 
         # Set scales and mutlipliers
@@ -335,7 +341,7 @@ def receive_client_secret(gui):
 
 @timed_try_wrapper
 def pick_color(target_object, save_name):
-    new_color = QColorDialog.getColor()
+    new_color = QColorDialog.getColor(QtGui.QColor(user_info.get("form", save_name)))
     user_info.set("form", save_name, new_color.name())
     user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
     target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
@@ -396,7 +402,6 @@ def request_client_secret():
         if "20" in str(post):
             gui_main.count_report_string.setText('Request has been send please look out for a friend request on Discord')
             # QInputDialog.getText(promt_obj, 'Request Sent', 'Request has been send please look out for a friend request on Discord')
-
 
 
 if __name__ == "__main__":

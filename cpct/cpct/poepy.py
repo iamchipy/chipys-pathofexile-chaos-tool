@@ -344,6 +344,9 @@ class DataParser():
     
     def filter_identified(self, list_of_items:list) -> list:
         return [i for i in list_of_items if i["identified"] is False]
+    
+    def filter_ilvl(self, list_of_items:list, ilvl:int=60) -> list:
+        return [i for i in list_of_items if i["ilvl"] >= 60]
 
 
 

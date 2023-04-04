@@ -33,8 +33,6 @@ def load():
                    "color_bodies_rgb":"[200, 200, 20, 255]",
                    "color_boots":"#457dff",
                    "color_boots_rgb":"[200, 200, 20, 255]",
-
-                   
                    }
 
 
