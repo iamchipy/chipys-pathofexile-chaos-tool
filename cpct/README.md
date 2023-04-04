@@ -12,12 +12,21 @@
 - [chipy](https://chipy.dev)
 
 ## Installation
+**Two primary methods**
 
+*PIP install method*
 ```console
-pip install cpct
-OR
 pip install cpct --upgrade -t c:/chipy-scripts/
+run C:/chipy-scripts/cpct/cpct.py OR C:/chipy-scripts/cpct/_START_HERE.cmd
 ```
+*GitHub download*
+```console
+Download from [GitHub](https://github.com/iamchipy/chipys-pathofexile-chaos-tool) 
+Unzip to a desired location
+run _install_requirements.py (to install needed packages to global env)
+run cpct.py OR _START_HERE.cmd
+```
+
 # DISCLAIMER:
 This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
 
