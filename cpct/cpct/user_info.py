@@ -19,6 +19,7 @@ def load():
                    "username":"",
                    "league":"",
                    "tab":"",
+                   "sets_goal":"4",
                    "color_weapons":"#457dff",
                    "color_weapons_rgb":"[200, 200, 20, 255]",
                    "color_helmets":"#457dff",

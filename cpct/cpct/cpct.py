@@ -85,9 +85,12 @@ def timed_try_wrapper(function):
 
 def apply_ui_defaults():
     global gui_main
+
+    # set previous selections
     gui_main.item_filter_browse.setText(os.path.split(user_info.get("form", "filter_name"))[1])
     gui_main.client_secret_input.setText(user_info.get("api","client_secret"))
     gui_main.client_path_browse.setText(user_info.get("form", "client_path")[0:22]+"..."+user_info.get("form", "client_path")[-13:])
+    gui_main.sets_target.setValue(int(user_info.get("form", "sets_goal")))
 
     # set previous colours
     gui_main.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
@@ -166,6 +169,7 @@ def apply_ui_connections():
     gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
     gui_main.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_main))
     gui_main.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_main))
+    gui_main.sets_target.valueChanged.connect(lambda: change_target_count(gui_main))
 
     # Link Text
     gui_main.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_main))
@@ -405,6 +409,9 @@ def request_client_secret():
             gui_main.count_report_string.setText('Request has been send please look out for a friend request on Discord')
             # QInputDialog.getText(promt_obj, 'Request Sent', 'Request has been send please look out for a friend request on Discord')
 
+@timed_try_wrapper
+def change_target_count(gui):
+    user_info.set("form","sets_goal", str(gui.sets_target.value()))
 
 if __name__ == "__main__":
     # load user file
