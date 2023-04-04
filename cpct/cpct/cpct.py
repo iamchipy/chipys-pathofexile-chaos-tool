@@ -341,11 +341,13 @@ def receive_client_secret(gui):
 
 @timed_try_wrapper
 def pick_color(target_object, save_name):
-    new_color = QColorDialog.getColor(QtGui.QColor(user_info.get("form", save_name)))
-    user_info.set("form", save_name, new_color.name())
-    user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
-    target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
-    update_item_filter()
+    current_color = QtGui.QColor(user_info.get("form", save_name))
+    new_color = QColorDialog.getColor(current_color, title=f"Pick a new color for {save_name}")
+    if new_color.isValid():
+        user_info.set("form", save_name, new_color.name())
+        user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
+        target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
+        update_item_filter()
 
 def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return_string = ""
