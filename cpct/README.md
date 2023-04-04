@@ -27,14 +27,25 @@ run _install_requirements.py (to install needed packages to global env)
 run cpct.py OR _START_HERE.cmd
 ```
 
-# DISCLAIMER:
-This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
-
 ## Features
-[![GUI](https://chipy.dev/res/ctcp_gui.png)](chipy.dev)
+[![GUI](https://chipy.dev/res/ctcp_gui.png)](#)
+
 **OAuth2 permissions**
+
 No need to dig out and reuse your webbrowser's sessionID token
 
-## License
+**Automated itemfilter updating**
 
+You can select which item filter you are using and have the app add chaos recipe highlights for you
+
+
+## Feature Requests
+
+- Integration with FilterBlade filters (rather than just added it's own)
+- Integration with Online filters (if possible)
+
+## License
 `cpct` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+## DISCLAIMER:
+This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
