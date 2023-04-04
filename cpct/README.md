@@ -9,7 +9,7 @@
 
 - [Installation](#installation)
 - [License](#license)
-- [chipy](https://chipy.dev)
+- [chipy.dev](https://chipy.dev)
 
 ## Installation
 **Two primary methods**
@@ -29,6 +29,11 @@ run cpct.py OR _START_HERE.cmd
 
 # DISCLAIMER:
 This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
+
+## Features
+[![GUI](https://chipy.dev/res/ctcp_gui.png)](chipy.dev)
+**OAuth2 permissions**
+No need to dig out and reuse your webbrowser's sessionID token
 
 ## License
 
