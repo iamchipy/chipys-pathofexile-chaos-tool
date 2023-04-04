@@ -201,6 +201,7 @@ def action_login_link(gui):
     # continue the loading chain
     action_load_leagues(gui)
 
+@timed_try_wrapper
 def action_load_leagues(gui):
     global parser
     leagues = parser.get_leagues()
@@ -213,6 +214,7 @@ def action_load_leagues(gui):
     # set previous league
     gui_main.select_league.setCurrentText(user_info.get("form","league"))
     
+@timed_try_wrapper
 def action_set_league(gui):
     # load current selection for league
     league = gui.select_league.currentText()
@@ -227,6 +229,7 @@ def action_set_league(gui):
             user_info.set("form", "league",gui.select_league.currentText()) 
             action_load_tabs(gui, league)
 
+@timed_try_wrapper
 def action_load_tabs(gui, league):
     global parser, gui_main
     tabs = parser.get_tab_names(league).keys()
@@ -234,10 +237,12 @@ def action_load_tabs(gui, league):
     gui.select_tab.clear()
     gui.select_tab.addItems(tabs)
     
+@timed_try_wrapper
 def action_set_tab(gui, force_recache:bool=False):
     global parser, gui_main
     user_info.set("form", "tab", gui.select_tab.currentText())
   
+@timed_try_wrapper
 def update_unid_counts(gui, force_recache:bool=False):
     global parser, gui_main, refresh_off_cooldown
     league_of_interest = gui.select_league.currentText()
