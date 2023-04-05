@@ -234,6 +234,7 @@ class DataParser():
             league (str): league name as 
         """
         if league+"_stash_response" not in self.cached or force_recache:
+            print("Caching "+league+"_stash")
             self.cached[league+"_stash_response"] = self.api_handler.get_stash(league)
             self.cached[league+"_stash"] = json.loads(self.cached[league+"_stash_response"].content)["stashes"]
     
@@ -293,6 +294,7 @@ class DataParser():
         
     def _cache_tab(self, league:str, stash_id:str, force_recache:bool=False) -> dict:
         if league+"_"+stash_id not in self.cached or force_recache:
+            print("Caching "+league+"_"+stash_id)
             self.cached[league+"_"+stash_id+"_response"] = self.api_handler.get_tab(league, stash_id)
             raw=json.loads(self.cached[league+"_"+stash_id+"_response"].content)
             # print(type(raw))
@@ -350,6 +352,7 @@ class DataParser():
 
     def _cache_profile(self):
         if "profile" not in self.cached:
+            print("Caching Profile")
             self.cached["profile_response"] = self.api_handler.get_profile()
             self.cached["profile_name"] = json.loads(self.cached["profile_response"].content)["name"]
     
@@ -359,6 +362,7 @@ class DataParser():
 
     def _cache_characters(self):
         if "characters" not in self.cached:
+            print("Caching Characters")
             self.cached["characters_response"] = self.api_handler.get_characters()
             self.cached["characters"] = json.loads(self.cached["characters_response"].content)["characters"]
 
@@ -372,6 +376,7 @@ class DataParser():
 
     def _cache_leagues(self):
         if "leagues" not in self.cached:
+            print("Caching Leagues")
             self.cached["leagues_response"] = self.api_handler.get_leagues()
             self.cached["leagues"] = json.loads(self.cached["leagues_response"].content)["leagues"]
 
@@ -479,14 +484,14 @@ def validate_tab(parser:DataParser,
 
 def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=False):
     counts={"Total":0,
-            "Weapon":0,
-            "Helmet":0,
-            "Body":0,
+            "Weapons":0,
+            "Helmets":0,
+            "Body Armors":0,
             "Boots":0,
             "Gloves":0,
-            "Belt":0,
-            "Amulet":0,
-            "Ring":0}
+            "Belts":0,
+            "Amulets":0,
+            "Rings":0}
     for item in list_of_items:
         slot = SLOT_LOOKUP.get(item["baseType"], "Unknown")
         if slot in counts or include_all_unid:

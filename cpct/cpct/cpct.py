@@ -111,7 +111,7 @@ def apply_ui_connections():
     Args:
         gui_obj (gui.Ui_MainWindow): Main window GUI object
     """
-    global gui_main, MainWindow
+    global gui_main, MainWindow, parser
 
     # set window Icons
     app.setWindowIcon(QtGui.QIcon('./cpct/cpct/img/ChipyLogo.png'))
@@ -132,14 +132,14 @@ def apply_ui_connections():
     gui_main.color_link_gloves.setIcon(icon)
 
     # Link ColorPickers
-    gui_main.color_link_amulets.clicked.connect(lambda: pick_color( gui_main.count_amulets, "color_amulets"))
-    gui_main.color_link_belts.clicked.connect(lambda: pick_color( gui_main.count_belts, "color_belts"))
-    gui_main.color_link_bodies.clicked.connect(lambda: pick_color( gui_main.count_bodies, "color_bodies"))
-    gui_main.color_link_boots.clicked.connect(lambda: pick_color( gui_main.count_boots, "color_boots"))
-    gui_main.color_link_gloves.clicked.connect(lambda: pick_color( gui_main.count_gloves, "color_gloves"))
-    gui_main.color_link_helmets.clicked.connect(lambda: pick_color( gui_main.count_helmets, "color_helmets"))
-    gui_main.color_link_rings.clicked.connect(lambda: pick_color( gui_main.count_rings, "color_rings"))
-    gui_main.color_link_weapons.clicked.connect(lambda: pick_color( gui_main.count_weapons, "color_weapons"))
+    gui_main.color_link_amulets.clicked.connect(lambda: pick_color(gui_main, gui_main.count_amulets, "color_amulets"))
+    gui_main.color_link_belts.clicked.connect(lambda: pick_color(gui_main, gui_main.count_belts, "color_belts"))
+    gui_main.color_link_bodies.clicked.connect(lambda: pick_color(gui_main, gui_main.count_bodies, "color_bodies"))
+    gui_main.color_link_boots.clicked.connect(lambda: pick_color(gui_main, gui_main.count_boots, "color_boots"))
+    gui_main.color_link_gloves.clicked.connect(lambda: pick_color(gui_main, gui_main.count_gloves, "color_gloves"))
+    gui_main.color_link_helmets.clicked.connect(lambda: pick_color(gui_main, gui_main.count_helmets, "color_helmets"))
+    gui_main.color_link_rings.clicked.connect(lambda: pick_color(gui_main, gui_main.count_rings, "color_rings"))
+    gui_main.color_link_weapons.clicked.connect(lambda: pick_color(gui_main, gui_main.count_weapons, "color_weapons"))
 
     # # link menus
     gui_main.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
@@ -200,6 +200,9 @@ def action_login_link(gui):
 
     # continue the loading chain
     action_load_leagues(gui)
+    
+    # report completion
+    gui.count_report_string.setText("Successful PathOfExile.com sign-in!")
 
 @timed_try_wrapper
 def action_load_leagues(gui):
@@ -243,8 +246,8 @@ def action_set_tab(gui, force_recache:bool=False):
     user_info.set("form", "tab", gui.select_tab.currentText())
   
 @timed_try_wrapper
-def update_unid_counts(gui, force_recache:bool=False):
-    global parser, gui_main, refresh_off_cooldown
+def update_unid_counts(gui, force_recache:bool=False)->list[list, int]:
+    global refresh_off_cooldown, parser
     league_of_interest = gui.select_league.currentText()
     refresh_off_cooldown = False
     gui_main.refresh_link.setEnabled(refresh_off_cooldown)
@@ -273,16 +276,21 @@ def update_unid_counts(gui, force_recache:bool=False):
         multiplier = 100//target
 
         # set GUI element values
-        gui_main.count_weapons.setValue(count["Weapon"]*multiplier)
-        gui_main.count_helmets.setValue(count["Helmet"]*multiplier)
-        gui_main.count_bodies.setValue(count["Body"]*multiplier)
+        gui_main.count_weapons.setValue(count["Weapons"]*multiplier)
+        gui_main.count_helmets.setValue(count["Helmets"]*multiplier)
+        gui_main.count_bodies.setValue(count["Body Armors"]*multiplier)
         gui_main.count_boots.setValue(count["Boots"]*multiplier)
         gui_main.count_gloves.setValue(count["Gloves"]*multiplier)
-        gui_main.count_belts.setValue(count["Belt"]*multiplier)
-        gui_main.count_amulets.setValue(count["Amulet"]*multiplier)
-        gui_main.count_rings.setValue((count["Ring"]*multiplier)//2)
+        gui_main.count_belts.setValue(count["Belts"]*multiplier)
+        gui_main.count_amulets.setValue(count["Amulets"]*multiplier)
+        gui_main.count_rings.setValue((count["Rings"]*multiplier)//2)
+        
+        # report
+        return [count, target]
     except Exception as e:
-        gui.count_report_string.setText("ERR:"+str(e))
+        t = str(time.time())[-1:]
+        gui.count_report_string.setText("ERR:"+str(e)+f"[{t}]")
+        return [False, False]
 
 def async_two():
     global refresh_off_cooldown, gui_main, async_time
@@ -300,7 +308,7 @@ def async_two():
 def log_search():
     """Checks the ClientLog for a maching zone change with timestamp in the current minute
     """
-    global modified, previous, gui_main
+    global modified, previous, gui_main, parser
     # 2023/03/30 09:11     
     # 2023/03/30 09:26:41 1117798968 cffb0734 [INFO Client 31504] : You have entered Aspirants' Plaza.     
     snippet = " : You have entered"
@@ -349,14 +357,14 @@ def receive_client_secret(gui):
     user_info.set("api","client_secret",gui_main.client_secret_input.text())
 
 @timed_try_wrapper
-def pick_color(target_object, save_name):
+def pick_color(gui, target_object, save_name):
     current_color = QtGui.QColor(user_info.get("form", save_name))
     new_color = QColorDialog.getColor(current_color, title=f"Pick a new color for {save_name}")
     if new_color.isValid():
         user_info.set("form", save_name, new_color.name())
         user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
         target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
-        update_item_filter()
+        update_item_filter(gui)
 
 def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return_string = ""
@@ -366,14 +374,19 @@ def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return return_string
 
 @timed_try_wrapper
-def update_item_filter(gui=None):
+def update_item_filter(gui):
     global gui_main
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
     path = user_info.cfg.get("form","filter_name")
     mode = gui_main.filter_mode.currentText()
+    slot_count, target = update_unid_counts(gui)
 
-    # read data
+    # exit case for when counts could not be found
+    if not slot_count:
+        return False
+
+    # read data without mod section
     current_filter = ""
     is_section_to_replace=False
     with open(path, "r") as f:
@@ -385,22 +398,32 @@ def update_item_filter(gui=None):
             if not is_section_to_replace and footer not in line:
                 current_filter += line
 
-    # append
-   
+    # rebuild filter text adding back in slots as needed   
     prefix = header
     if "Disabled" not in mode:
-        prefix += poepy.ItemFilterEntry("Weapons",user_info.cfg.get("form","color_weapons_rgb"),width="= 1").to_str()
-        prefix += poepy.ItemFilterEntry("Helmets",user_info.cfg.get("form","color_helmets_rgb")).to_str()
-        prefix += poepy.ItemFilterEntry("Body Armours",user_info.cfg.get("form","color_bodies_rgb")).to_str()   
-        prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
-        prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
-        prefix += poepy.ItemFilterEntry("Amulets",user_info.cfg.get("form","color_amulets_rgb")).to_str()
-        prefix += poepy.ItemFilterEntry("Rings",user_info.cfg.get("form","color_rings_rgb")).to_str()
+        print(slot_count)
+        if slot_count["Weapons"] >= target:
+            prefix += poepy.ItemFilterEntry("Weapons",user_info.cfg.get("form","color_weapons_rgb"),width="= 1").to_str()
+        if slot_count["Helmets"] >= target:
+            prefix += poepy.ItemFilterEntry("Helmets",user_info.cfg.get("form","color_helmets_rgb")).to_str()
+        if slot_count["Body Armors"] >= target:
+            prefix += poepy.ItemFilterEntry("Body Armours",user_info.cfg.get("form","color_bodies_rgb")).to_str()   
+        if slot_count["Boots"] >= target:
+            prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
+        if slot_count["Gloves"] >= target:
+            prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
+        if slot_count["Amulets"] >= target:
+            prefix += poepy.ItemFilterEntry("Amulets",user_info.cfg.get("form","color_amulets_rgb")).to_str()
+        if slot_count["Rings"] >= target:
+            prefix += poepy.ItemFilterEntry("Rings",user_info.cfg.get("form","color_rings_rgb")).to_str()
     prefix += footer
 
     # write
     with open(path, "w") as f:
         f.write(prefix+current_filter)
+    
+    # announce update
+    gui_main.count_report_string.setText("Filter updated . . .")
             
 @timed_try_wrapper
 def request_client_secret():
