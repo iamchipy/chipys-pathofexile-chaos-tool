@@ -30,13 +30,9 @@ run cpct.py OR _START_HERE.cmd
 ## Features
 [![GUI](https://chipy.dev/res/ctcp_gui.png)](#)
 
-**OAuth2 permissions**
-
-No need to dig out and reuse your webbrowser's sessionID token
-
-**Automated itemfilter updating**
-
-You can select which item filter you are using and have the app add chaos recipe highlights for you
+**OAuth2 permissions** - No need to dig out and reuse your webbrowser's sessionID token
+**Automated itemfilter updating** - You can select which item filter you are using and have the app add chaos recipe highlights for you to existing filter. It can also update those when you enter a new zone 
+**Itemfilter color selection** - You can pick background color for the items of that slot
 
 
 ## Feature Requests
