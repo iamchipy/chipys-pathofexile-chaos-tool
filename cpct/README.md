@@ -31,17 +31,24 @@ run cpct.py OR _START_HERE.cmd
 [![GUI](https://chipy.dev/res/ctcp_gui.png)](#)
 
 **OAuth2 permissions** 
+
 - The is the appropriate way to get correct permissions and access
 - No need to dig out and reuse your webbrowser's sessionID token (which is against ToC)
 - Can be easily revoked from your [PoE Profile](https://www.pathofexile.com/my-account/applications) at any time
+
 **Automated itemfilter updating** 
+
 - Works with existing items filters to modify/overlay recipe highlights
 - Only affects item backgrouns so your existing border and text colors will be unaffected
 - It can also update those when you enter a new zone to high items types that you have enough of
+
 **Itemfilter color selection** 
+
 - In app filter customization now allows you to select any color you like for each slot
 - *PLANNED* Filters boarders/text/size will be customizable too
+
 **Itemfilter mode selection** 
+
 - Default will add it's recipe items colors to existing filter
 - Disabled will no affect your filter at all
 - *PLANNED* FilterBlade will edit the chaos recipe section of a filterblade filter
