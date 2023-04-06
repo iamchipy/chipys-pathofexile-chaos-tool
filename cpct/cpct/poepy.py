@@ -29,6 +29,18 @@ DEPTH_STASH_NAMES = 1
 ITEM_FILTER_TITLE_START = "# START -- Chipy's PoE Chaos Tool\n"
 ITEM_FILTER_TITLE_END = "# END -- Chipy's PoE Chaos Tool\n"
 
+FRAMETYPE_NORMAL = 0
+FRAMETYPE_MAGIC = 1
+FRAMETYPE_RARE = 2
+FRAMETYPE_UNIQUE = 3
+FRAMETYPE_GEM = 4
+FRAMETYPE_CURRENCY = 5
+FRAMETYPE_DIVINATIONCARD = 6
+FRAMETYPE_QUEST = 7
+FRAMETYPE_PROPHECY = 8
+FRAMETYPE_FOIL = 9
+FRAMETYPE_SUPPORTERFOIL = 10
+
 """
 PROCESS
 - Connection handler
@@ -349,6 +361,14 @@ class DataParser():
     
     def filter_ilvl(self, list_of_items:list, ilvl:int=60) -> list:
         return [i for i in list_of_items if i["ilvl"] >= 60]
+    
+    def filter_rarity(self, list_of_items:list, rarity:str="rare") -> list:
+        # TODO build the rest of the frametypes
+        # print([i["frameType"] for i in list_of_items ])
+        if rarity == "rare":
+            return [i for i in list_of_items if i["frameType"] == FRAMETYPE_RARE]
+        print("Filtering for rarity '{rarity}' isn't supported yet")
+        return [i for i in list_of_items if i["frameType"] == FRAMETYPE_MAGIC]        
 
     def _cache_profile(self):
         if "profile" not in self.cached:
@@ -484,14 +504,14 @@ def validate_tab(parser:DataParser,
 
 def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=False):
     counts={"Total":0,
-            "Weapons":0,
-            "Helmets":0,
-            "Body Armors":0,
-            "Boots":0,
-            "Gloves":0,
-            "Belts":0,
-            "Amulets":0,
-            "Rings":0}
+            "Weapon":0,
+            "Helmet":0,
+            "Body Armor":0,
+            "Boot":0,
+            "Glove":0,
+            "Belt":0,
+            "Amulet":0,
+            "Ring":0}
     for item in list_of_items:
         slot = SLOT_LOOKUP.get(item["baseType"], "Unknown")
         if slot in counts or include_all_unid:

@@ -20,11 +20,12 @@ base_type_dict = dict(json.loads(r.content))
 
 # concat into list of basetype&class
 BASE_TYPES = dict([[base_type_dict[base_type]["name"],base_type_dict[base_type]["item_class"]] for base_type in base_type_dict if base_type_dict[base_type]["domain"] == "item"])
+
 # build slot list
 SLOT_LOOKUP = dict([slot_sub(k,v) for k,v in BASE_TYPES.items()])
 
 # TODO reduce excess string check by narrowing down this list 
-"""Body Armours"""
+"""Body Armour"""
 WEAPON_CLASSES = [v for v in BASE_TYPES.items() if any(item in v for item in WEAPON_LIST)]
 
 print("done")

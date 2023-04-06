@@ -12,7 +12,6 @@
 - [chipy.dev](https://chipy.dev)
 
 ## Installation
-**Two primary methods**
 
 *PIP install method*
 ```console
@@ -27,6 +26,13 @@ run _install_requirements.py (to install needed packages to global env)
 run cpct.py OR _START_HERE.cmd
 ```
 
+**You will need to request a Client Secrect from me (PLEASE keep this private, if client secrects get shared it'll invalidate the whole app on GGG's side)**
+
+- Go to Settings > Request client secrect > Enter your DiscordName#1234 (this is how I'll reach you)
+- Enter the client secrect and then attempt to log-in (top left) 
+- One logged in select your Chaos Recipe tab from the dropdown menus (only supports a single tab right now)
+- Then select how many recipe sets you are aiming for before turning them in (I recommend 4-8 but NO less than 2)
+
 # Why Chaos Recipe
 As many wealthy players have already said; the chaos recipe is a trap. They suggest that it's simply not time efficient. If you spend 30 minutes just farming unidentified items to complete 2x chaos recipes then thats roughly 8chaos/hour. The argument is that in an hour of running T1 rolled maps you should easily make more than that. *WHICH IS TRUE* 
 
@@ -34,15 +40,15 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 
 **You should NOT . . .**
 
-- *As a rule of thumb* Do NOT have chaos recipe as your only/primary objective as you play
-- Do NOT waste your time selling identified sets ( 1c instead of 2c is almost NEVER worth it in trade leagues )
-- Do NOT waste your time selling recipe in single sets
+- **Do NOT** have chaos recipe as your only/primary objective as you play *(As a rule of thumb)* 
+- **Do NOT** waste your time selling identified sets ( 1c instead of 2c is almost NEVER worth it in trade leagues )
+- **Do NOT** waste your time selling recipe in single sets
 
 **You SHOULD . . .**
 
-- Do passively collect choas recipe items and just toss them in a dump tab
-- Do keep your jewlery unidentified in trade leagues ( Statistically 2c is almost ALWAYS able to buy you a better ring/amulet than what you will ID )
-- Do collect a minimum of 2x complete recipe sets before selling them as you can fit 2x complete sets in your inventory
+- **Do** passively collect choas recipe items and just toss them in a dump tab
+- **Do** keep your jewlery unidentified in trade leagues ( Statistically 2c is almost ALWAYS able to buy you a better ring/amulet than what you will ID )
+- **Do** collect a minimum of 2x complete recipe sets before selling them as you can fit 2x complete sets in your inventory
 
 **Edge cases . . .**
 

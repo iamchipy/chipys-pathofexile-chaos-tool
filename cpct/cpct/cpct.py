@@ -13,6 +13,11 @@ import poepy
 import user_info
 from __about__ import __version__
 
+# PoE dev Docs for ref
+# https://www.pathofexile.com/developer/docs
+# TYPE/Structures
+# https://www.pathofexile.com/developer/docs/reference#type-Item
+
 # type checking block (AND RUFF INFO)
 # https://www.youtube.com/watch?v=bcAqceZkZRQ
 if typing.TYPE_CHECKING:
@@ -161,7 +166,7 @@ def apply_ui_connections():
 
     # # link buttons
     gui_main.login_link.clicked.connect(lambda: action_login_link(gui_main))
-    gui_main.refresh_link.clicked.connect(lambda: update_unid_counts(gui_main, True))
+    gui_main.refresh_link.clicked.connect(lambda: count_unid_rares(gui_main, True))
     gui_main.item_filter_browse.clicked.connect(lambda: browser_item_filters(gui_main))
     gui_main.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_main))
 
@@ -246,9 +251,11 @@ def action_set_tab(gui, force_recache:bool=False):
     user_info.set("form", "tab", gui.select_tab.currentText())
   
 @timed_try_wrapper
-def update_unid_counts(gui, force_recache:bool=False)->list[list, int]:
+def count_unid_rares(gui, force_recache:bool=False)->list[list, int]:
     global refresh_off_cooldown, parser
     league_of_interest = gui.select_league.currentText()
+
+    # put the manual refresh button on cooldown
     refresh_off_cooldown = False
     gui_main.refresh_link.setEnabled(refresh_off_cooldown)
 
@@ -257,18 +264,26 @@ def update_unid_counts(gui, force_recache:bool=False)->list[list, int]:
     try:
         # tab_of_interes
         tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
+        print("tabs_of_interest>",type(tabs_of_interest))
 
         # list of items
         items_of_interest = parser.get_items(tabs_of_interest, league_of_interest, force_recache)
+        print("items_of_interest>",type(items_of_interest))
 
         # filter for unid
         items_unidentified = parser.filter_identified(items_of_interest)
+        print("items_unidentified>",items_unidentified)
 
         # filter for ilevel
         items_unidentified_ilvl = parser.filter_ilvl(items_unidentified)
+        print("items_unidentified_ilvl>",items_unidentified_ilvl)
+
+        # filter for rares
+        items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
+        print("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
         
         # loop and count unids
-        count = poepy.count_slots(parser, items_unidentified_ilvl)
+        count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
         # gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
 
         # Set scales and mutlipliers
@@ -276,14 +291,14 @@ def update_unid_counts(gui, force_recache:bool=False)->list[list, int]:
         multiplier = 100//target
 
         # set GUI element values
-        gui_main.count_weapons.setValue(count["Weapons"]*multiplier)
-        gui_main.count_helmets.setValue(count["Helmets"]*multiplier)
-        gui_main.count_bodies.setValue(count["Body Armors"]*multiplier)
-        gui_main.count_boots.setValue(count["Boots"]*multiplier)
-        gui_main.count_gloves.setValue(count["Gloves"]*multiplier)
-        gui_main.count_belts.setValue(count["Belts"]*multiplier)
-        gui_main.count_amulets.setValue(count["Amulets"]*multiplier)
-        gui_main.count_rings.setValue((count["Rings"]*multiplier)//2)
+        gui_main.count_weapons.setValue(count["Weapon"]*multiplier)
+        gui_main.count_helmets.setValue(count["Helmet"]*multiplier)
+        gui_main.count_bodies.setValue(count["Body Armor"]*multiplier)
+        gui_main.count_boots.setValue(count["Boot"]*multiplier)
+        gui_main.count_gloves.setValue(count["Glove"]*multiplier)
+        gui_main.count_belts.setValue(count["Belt"]*multiplier)
+        gui_main.count_amulets.setValue(count["Amulet"]*multiplier)
+        gui_main.count_rings.setValue((count["Ring"]*multiplier)//2)
         
         # report
         return [count, target]
@@ -326,7 +341,7 @@ def log_search():
                 if stamp in line and snippet in line:
                         print(line)
                         gui_main.count_report_string.setText(line[78:])
-                        update_unid_counts(gui_main)
+                        count_unid_rares(gui_main)
                         return
         # gui_main.count_report_string.setText("Reading... Done")
 
@@ -380,7 +395,7 @@ def update_item_filter(gui):
     footer = poepy.ITEM_FILTER_TITLE_END
     path = user_info.cfg.get("form","filter_name")
     mode = gui_main.filter_mode.currentText()
-    slot_count, target = update_unid_counts(gui)
+    slot_count, target = count_unid_rares(gui)
 
     # exit case for when counts could not be found
     if not slot_count:
@@ -402,20 +417,20 @@ def update_item_filter(gui):
     prefix = header
     if "Disabled" not in mode:
         print(slot_count)
-        if slot_count["Weapons"] >= target:
-            prefix += poepy.ItemFilterEntry("Weapons",user_info.cfg.get("form","color_weapons_rgb"),width="= 1").to_str()
-        if slot_count["Helmets"] >= target:
-            prefix += poepy.ItemFilterEntry("Helmets",user_info.cfg.get("form","color_helmets_rgb")).to_str()
-        if slot_count["Body Armors"] >= target:
-            prefix += poepy.ItemFilterEntry("Body Armours",user_info.cfg.get("form","color_bodies_rgb")).to_str()   
-        if slot_count["Boots"] >= target:
-            prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
-        if slot_count["Gloves"] >= target:
-            prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
-        if slot_count["Amulets"] >= target:
-            prefix += poepy.ItemFilterEntry("Amulets",user_info.cfg.get("form","color_amulets_rgb")).to_str()
-        if slot_count["Rings"] >= target:
-            prefix += poepy.ItemFilterEntry("Rings",user_info.cfg.get("form","color_rings_rgb")).to_str()
+        if slot_count["Weapon"] >= target:
+            prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapons_rgb"),width="= 1").to_str()
+        if slot_count["Helmet"] >= target:
+            prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmets_rgb")).to_str()
+        if slot_count["Body Armor"] >= target:
+            prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_bodies_rgb")).to_str()   
+        if slot_count["Boot"] >= target:
+            prefix += poepy.ItemFilterEntry("Boot",user_info.cfg.get("form","color_boots_rgb")).to_str()
+        if slot_count["Glove"] >= target:
+            prefix += poepy.ItemFilterEntry("Glove",user_info.cfg.get("form","color_gloves_rgb")).to_str()
+        if slot_count["Amulet"] >= target:
+            prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulets_rgb")).to_str()
+        if slot_count["Ring"] >= target:
+            prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_rings_rgb")).to_str()
     prefix += footer
 
     # write
