@@ -89,9 +89,9 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 
 ## Feature Requests
 
-- Integration with FilterBlade filters (rather than just added it's own)
-- Integration with Online filters (if possible)
-- Additional filter color/font/size customization options
+[] Integration with FilterBlade filters (rather than just added it's own)
+[] Integration with Online filters (if possible)
+[] Additional filter color/font/size customization options
 
 ## License
 `cpct` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
