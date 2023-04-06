@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-__version__ = '0.01.08'
+__version__ = '0.01.09'
 
 print("Loading CPT v"+__version__)
 
