@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
     ...
 
 # set statics
+IMG_FOLDER = os.path.realpath(__file__)[:-7]+"img\\"
 ASYNC_INTERVAL_MS = 1000
 PROGRESS_BAR_STYLE = """
 QProgressBar {
@@ -88,96 +89,96 @@ def timed_try_wrapper(function):
             result = False
     return wrapper    
 
-def apply_ui_defaults():
-    global gui_main
+def apply_ui_defaults(gui_obj, window_obj, app_obj):
+
+    # set window Icons
+    app_obj.setWindowIcon(QtGui.QIcon(IMG_FOLDER+'cpct_logo.png'))
+    window_obj.setWindowTitle(f"Chipy's PoE Chaos Tool (v{__version__})")
+    
+    # set login icon (this is to fix the image path issue)
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap(IMG_FOLDER+"poe.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    gui_obj.login_link.setIcon(icon)
+    print(IMG_FOLDER+"dropper.png")
+    icon.addPixmap(QtGui.QPixmap(IMG_FOLDER+"dropper.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    gui_obj.color_link_rings.setIcon(icon)
+    gui_obj.color_link_amulets.setIcon(icon)
+    gui_obj.color_link_belts.setIcon(icon)
+    gui_obj.color_link_bodies.setIcon(icon)
+    gui_obj.color_link_boots.setIcon(icon)
+    gui_obj.color_link_helmets.setIcon(icon)
+    gui_obj.color_link_weapons.setIcon(icon)
+    gui_obj.color_link_gloves.setIcon(icon)
 
     # set previous selections
-    gui_main.item_filter_browse.setText(os.path.split(user_info.get("form", "filter_name"))[1])
-    gui_main.client_secret_input.setText(user_info.get("api","client_secret"))
-    gui_main.client_path_browse.setText(user_info.get("form", "client_path")[0:22]+"..."+user_info.get("form", "client_path")[-13:])
-    gui_main.sets_target.setValue(int(user_info.get("form", "sets_goal")))
+    gui_obj.item_filter_browse.setText(os.path.split(user_info.get("form", "filter_name"))[1])
+    gui_obj.client_secret_input.setText(user_info.get("api","client_secret"))
+    gui_obj.client_path_browse.setText(user_info.get("form", "client_path")[0:22]+"..."+user_info.get("form", "client_path")[-13:])
+    gui_obj.sets_target.setValue(int(user_info.get("form", "sets_goal")))
 
     # set previous colours
-    gui_main.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
-    gui_main.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
-    gui_main.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_bodies")))
-    gui_main.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
-    gui_main.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
-    gui_main.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmets")))
-    gui_main.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
-    gui_main.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
+    gui_obj.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
+    gui_obj.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
+    gui_obj.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_bodies")))
+    gui_obj.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
+    gui_obj.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
+    gui_obj.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmets")))
+    gui_obj.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
+    gui_obj.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
 
     # defaults for item_filter modes
-    gui_main.filter_mode.addItems(["Default","FilterBlade","Custom","Disabled"])
+    gui_obj.filter_mode.addItems(["Default","FilterBlade","Custom","Disabled"])
     
-def apply_ui_connections():
+def apply_ui_connections(gui_obj):
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
     https://www.geeksforgeeks.org/function-wrappers-in-python/
     Args:
         gui_obj (gui.Ui_MainWindow): Main window GUI object
     """
-    global gui_main, MainWindow, parser
 
-    # set window Icons
-    app.setWindowIcon(QtGui.QIcon('./cpct/cpct/img/ChipyLogo.png'))
-    MainWindow.setWindowTitle(f"Chipy's PoE Chaos Tool (v{__version__})")
-    
-    # set login icon (this is to fix the image path issue)
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap("./cpct/cpct/img/poe.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-    gui_main.login_link.setIcon(icon)
-    icon.addPixmap(QtGui.QPixmap("./cpct/cpct/img/dropper.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-    gui_main.color_link_rings.setIcon(icon)
-    gui_main.color_link_amulets.setIcon(icon)
-    gui_main.color_link_belts.setIcon(icon)
-    gui_main.color_link_bodies.setIcon(icon)
-    gui_main.color_link_boots.setIcon(icon)
-    gui_main.color_link_helmets.setIcon(icon)
-    gui_main.color_link_weapons.setIcon(icon)
-    gui_main.color_link_gloves.setIcon(icon)
 
     # Link ColorPickers
-    gui_main.color_link_amulets.clicked.connect(lambda: pick_color(gui_main, gui_main.count_amulets, "color_amulets"))
-    gui_main.color_link_belts.clicked.connect(lambda: pick_color(gui_main, gui_main.count_belts, "color_belts"))
-    gui_main.color_link_bodies.clicked.connect(lambda: pick_color(gui_main, gui_main.count_bodies, "color_bodies"))
-    gui_main.color_link_boots.clicked.connect(lambda: pick_color(gui_main, gui_main.count_boots, "color_boots"))
-    gui_main.color_link_gloves.clicked.connect(lambda: pick_color(gui_main, gui_main.count_gloves, "color_gloves"))
-    gui_main.color_link_helmets.clicked.connect(lambda: pick_color(gui_main, gui_main.count_helmets, "color_helmets"))
-    gui_main.color_link_rings.clicked.connect(lambda: pick_color(gui_main, gui_main.count_rings, "color_rings"))
-    gui_main.color_link_weapons.clicked.connect(lambda: pick_color(gui_main, gui_main.count_weapons, "color_weapons"))
+    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulets"))
+    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belts"))
+    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_bodies"))
+    gui_obj.color_link_boots.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_boots, "color_boots"))
+    gui_obj.color_link_gloves.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_gloves, "color_gloves"))
+    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmets"))
+    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_rings"))
+    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapons"))
 
     # # link menus
-    gui_main.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
-    gui_main.actionGitHub.triggered.connect(lambda: webbrowser.open("https://github.com/iamchipy/chipys-pathofexile-chaos-tool/tree/main/cpct"))
-    gui_main.actionFilterblade_xyz.triggered.connect(lambda: webbrowser.open("https://www.filterblade.xyz/") )
-    gui_main.actionCraftOfExile_com.triggered.connect(lambda: webbrowser.open("https://www.craftofexile.com/en/") )
-    gui_main.actionMap_RegEx.triggered.connect(lambda: webbrowser.open("https://poe.re/#/maps") )
-    gui_main.actionPathOfBuilding_com.triggered.connect(lambda: webbrowser.open("https://pathofbuilding.community/") )
-    gui_main.actionPathOfExile_com.triggered.connect(lambda: webbrowser.open("https://www.pathofexile.com") )
-    gui_main.actionPoE_Lab.triggered.connect(lambda: webbrowser.open("https://www.poelab.com/") )
-    gui_main.actionPoE_Ninja.triggered.connect(lambda: webbrowser.open("https://www.poe.ninja") )
-    gui_main.actionVorici_Calculator.triggered.connect(lambda: webbrowser.open("https://siveran.github.io/calc.html") )
-    gui_main.actionAwakened_PoE_Trade.triggered.connect(lambda: webbrowser.open("https://github.com/SnosMe/awakened-poe-trade") )
-    gui_main.actionPatreon.triggered.connect(lambda: webbrowser.open("https://www.patreon.com/chipysPoEChaosTool") )
-    gui_main.actionInput_ClientSecret.triggered.connect(lambda: request_client_secret() )
+    gui_obj.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
+    gui_obj.actionGitHub.triggered.connect(lambda: webbrowser.open("https://github.com/iamchipy/chipys-pathofexile-chaos-tool/tree/main/cpct"))
+    gui_obj.actionFilterblade_xyz.triggered.connect(lambda: webbrowser.open("https://www.filterblade.xyz/") )
+    gui_obj.actionCraftOfExile_com.triggered.connect(lambda: webbrowser.open("https://www.craftofexile.com/en/") )
+    gui_obj.actionMap_RegEx.triggered.connect(lambda: webbrowser.open("https://poe.re/#/maps") )
+    gui_obj.actionPathOfBuilding_com.triggered.connect(lambda: webbrowser.open("https://pathofbuilding.community/") )
+    gui_obj.actionPathOfExile_com.triggered.connect(lambda: webbrowser.open("https://www.pathofexile.com") )
+    gui_obj.actionPoE_Lab.triggered.connect(lambda: webbrowser.open("https://www.poelab.com/") )
+    gui_obj.actionPoE_Ninja.triggered.connect(lambda: webbrowser.open("https://www.poe.ninja") )
+    gui_obj.actionVorici_Calculator.triggered.connect(lambda: webbrowser.open("https://siveran.github.io/calc.html") )
+    gui_obj.actionAwakened_PoE_Trade.triggered.connect(lambda: webbrowser.open("https://github.com/SnosMe/awakened-poe-trade") )
+    gui_obj.actionPatreon.triggered.connect(lambda: webbrowser.open("https://www.patreon.com/chipysPoEChaosTool") )
+    gui_obj.actionInput_ClientSecret.triggered.connect(lambda: request_client_secret() )
     
     #ClientSecrect Menu
-    # gui_main.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_main) )
+    # gui_obj.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_obj) )
 
     # # link buttons
-    gui_main.login_link.clicked.connect(lambda: action_login_link(gui_main))
-    gui_main.refresh_link.clicked.connect(lambda: count_unid_rares(gui_main, True))
-    gui_main.item_filter_browse.clicked.connect(lambda: browser_item_filters(gui_main))
-    gui_main.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_main))
+    gui_obj.login_link.clicked.connect(lambda: action_login_link(gui_obj))
+    gui_obj.refresh_link.clicked.connect(lambda: count_unid_rares(gui_obj, True))
+    gui_obj.item_filter_browse.clicked.connect(lambda: browser_item_filters(gui_obj))
+    gui_obj.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_obj))
 
     # Link ComboBoxes
-    gui_main.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_main))
-    gui_main.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_main))
-    gui_main.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_main))
-    gui_main.sets_target.valueChanged.connect(lambda: change_target_count(gui_main))
+    gui_obj.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_obj))
+    gui_obj.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_obj))
+    gui_obj.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_obj))
+    gui_obj.sets_target.valueChanged.connect(lambda: change_target_count(gui_obj))
 
     # Link Text
-    gui_main.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_main))
+    gui_obj.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_obj))
 
 @timed_try_wrapper
 def action_login_link(gui):
@@ -474,8 +475,8 @@ if __name__ == "__main__":
     gui_main.setupUi(MainWindow)
 
     # Modify the gui with connections and links
-    apply_ui_connections()  # here we modify actions to the GUI
-    apply_ui_defaults()  # set default values for the form when it's made
+    apply_ui_connections(gui_main)  # here we modify actions to the GUI
+    apply_ui_defaults(gui_main, MainWindow, app)  # set default values for the form when it's made
 
     # run app as the last thing in the script
     sys.exit(app.exec_())
