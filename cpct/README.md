@@ -8,6 +8,9 @@
 **Table of Contents**
 
 - [Installation](#installation)
+- [Why Chaos Recipe](#Why_Chaos_Recipe)
+- [Features](#Features)
+- [Features Requests](#Features_Requests)
 - [License](#license)
 - [chipy.dev](https://chipy.dev)
 
