@@ -92,6 +92,9 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 [ ] Integration with FilterBlade filters (rather than just added it's own)
 [ ] Integration with Online filters (if possible)
 [ ] Additional filter color/font/size customization options
+[ ] Rebuild item reading system into ENUM to easy class changes
+[ ] Add 2-H weapon options to filter
+[ ] Add league and tab memory
 
 ## License
 `cpct` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

@@ -5,7 +5,7 @@ import requests
 print("Fetching basetype info . . .",end=" ")
 
 # base weapons names 
-WEAPON_LIST = ["Sword", "Axe", "Dagger", "Staff", "Bow", "Wand", "Mace"]
+WEAPON_LIST = ["Sword", "Axe", "Dagger", "Staff", "Bow", "Wand", "Mace", "Sceptre", "Warstaff", "Claw"]
 ITEM_BASE_TYPES_URL = "https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/base_items.json"
 
 # combind slots for all weapon types to have a single slot "weapons"
@@ -21,8 +21,11 @@ base_type_dict = dict(json.loads(r.content))
 # concat into list of basetype&class
 BASE_TYPES = dict([[base_type_dict[base_type]["name"],base_type_dict[base_type]["item_class"]] for base_type in base_type_dict if base_type_dict[base_type]["domain"] == "item"])
 
-# build slot list
+# build slot lookup table
 SLOT_LOOKUP = dict([slot_sub(k,v) for k,v in BASE_TYPES.items()])
+
+# build slot list
+SLOT_LIST = {v[1] for v in SLOT_LOOKUP.items()}
 
 # TODO reduce excess string check by narrowing down this list 
 """Body Armour"""
@@ -33,4 +36,9 @@ print("done")
 if __name__ == "__main__":
     # print(SLOT_LOOKUP)
     # print(base_type_dict)
-    print(WEAPON_CLASSES)
+    print(BASE_TYPES)
+
+
+
+
+

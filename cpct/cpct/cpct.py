@@ -1,3 +1,4 @@
+import math
 import typing
 import datetime
 import os
@@ -21,7 +22,8 @@ from __about__ import __version__
 # type checking block (AND RUFF INFO)
 # https://www.youtube.com/watch?v=bcAqceZkZRQ
 if typing.TYPE_CHECKING:
-    ...
+    api:poepy.PoeApiHandler
+    parser:poepy.DataParser
 
 # set statics
 IMG_FOLDER = os.path.realpath(__file__)[:-7]+"img\\"
@@ -36,9 +38,6 @@ QProgressBar::chunk {
 	border-radius: 6px;
 }
 """
-
-api:poepy.PoeApiHandler
-parser:poepy.DataParser
 
 # variables for searching log files to detect new zone
 modified = 0
@@ -58,6 +57,9 @@ class AsyncMainWindow(QMainWindow):
         self.log_timer.start(ASYNC_INTERVAL_MS)
         print("Started")
 
+def timestamp():
+    return time.strftime("%H:%M:%S")
+
 def try_wrapper(function):
     """Simple wrapper that includes a TRY loop
     Args:
@@ -67,7 +69,7 @@ def try_wrapper(function):
         try:
             return function(*args, **kwargs)
         except Exception as e:
-            print(function.__name__, "=> FAILED:", e)
+            print(timestamp(), function.__name__, "=> FAILED:", e)
             return False
     return wrapper  
 
@@ -85,7 +87,7 @@ def timed_try_wrapper(function):
             return result
         except Exception as e:
             end = time.time()
-            print(function.__name__, "=> FAILED:",end-start, e)
+            print(timestamp(), function.__name__, "=> FAILED:",end-start, e)
             result = False
     return wrapper    
 
@@ -117,19 +119,19 @@ def apply_ui_defaults(gui_obj, window_obj, app_obj):
     gui_obj.sets_target.setValue(int(user_info.get("form", "sets_goal")))
 
     # set previous colours
-    gui_obj.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
-    gui_obj.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulets")))
-    gui_obj.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_bodies")))
+    gui_obj.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulet")))
+    gui_obj.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_belt")))
+    gui_obj.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_body_armour")))
     gui_obj.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
     gui_obj.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
-    gui_obj.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmets")))
-    gui_obj.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_rings")))
-    gui_obj.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapons")))
+    gui_obj.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmet")))
+    gui_obj.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_ring")))
+    gui_obj.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapon")))
 
     # defaults for item_filter modes
     gui_obj.filter_mode.addItems(["Default","FilterBlade","Custom","Disabled"])
     
-def apply_ui_connections(gui_obj):
+def apply_ui_connections(gui_obj, parser):
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
     https://www.geeksforgeeks.org/function-wrappers-in-python/
     Args:
@@ -138,14 +140,14 @@ def apply_ui_connections(gui_obj):
 
 
     # Link ColorPickers
-    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulets"))
-    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belts"))
-    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_bodies"))
+    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulet"))
+    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belt"))
+    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_body_armour"))
     gui_obj.color_link_boots.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_boots, "color_boots"))
     gui_obj.color_link_gloves.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_gloves, "color_gloves"))
-    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmets"))
-    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_rings"))
-    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapons"))
+    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmet"))
+    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_ring"))
+    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapon"))
 
     # # link menus
     gui_obj.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
@@ -166,37 +168,34 @@ def apply_ui_connections(gui_obj):
     # gui_obj.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_obj) )
 
     # # link buttons
-    gui_obj.login_link.clicked.connect(lambda: action_login_link(gui_obj))
-    gui_obj.refresh_link.clicked.connect(lambda: count_unid_rares(gui_obj, True))
+    gui_obj.login_link.clicked.connect(lambda: action_login_link(gui_obj, parser))
+    gui_obj.refresh_link.clicked.connect(lambda: update_item_filter(gui_obj, parser, True))
     gui_obj.item_filter_browse.clicked.connect(lambda: browser_item_filters(gui_obj))
     gui_obj.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_obj))
 
     # Link ComboBoxes
     gui_obj.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_obj))
     gui_obj.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_obj))
-    gui_obj.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_obj))
+    gui_obj.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_obj, parser))
     gui_obj.sets_target.valueChanged.connect(lambda: change_target_count(gui_obj))
 
     # Link Text
     gui_obj.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_obj))
 
 @timed_try_wrapper
-def action_login_link(gui):
-    global api, parser, gui_main
-    api = poepy.PoeApiHandler(client_id=user_info.cfg["api"]["CLIENT_ID"],
-                                    client_secret=user_info.cfg["api"]["CLIENT_SECRET"],
-                                    scope=user_info.cfg["api"]["SCOPE"],
-                                    uri=user_info.cfg["api"]["REDIRECT_URI"],
-                                    manual_token=user_info.cfg["api"]["TOKEN"]
-                                    )
-    parser = poepy.DataParser(api_handler = api)
+def action_login_link(gui, parser):
+    parser.connect( client_id=user_info.cfg["api"]["CLIENT_ID"],
+                    client_secret=user_info.cfg["api"]["CLIENT_SECRET"],
+                    scope=user_info.cfg["api"]["SCOPE"],
+                    uri=user_info.cfg["api"]["REDIRECT_URI"],
+                    manual_token=user_info.cfg["api"]["TOKEN"]
+                    )
 
     # save any token changes
-    user_info.set("api","TOKEN", api.token)
+    user_info.set("api","TOKEN", parser.api_handler.token)
     user_info.set("form","username", parser.get_username())
     # gui_main.client_secret_input.isEnabled = False
     gui_main.client_secret_input.setEnabled(False)
-
 
     # set login name
     gui.login_link.setText(user_info.get("form","username"))
@@ -242,6 +241,7 @@ def action_set_league(gui):
 def action_load_tabs(gui, league):
     global parser, gui_main
     tabs = parser.get_tab_names(league).keys()
+
     # clear the box and repop
     gui.select_tab.clear()
     gui.select_tab.addItems(tabs)
@@ -251,9 +251,18 @@ def action_set_tab(gui, force_recache:bool=False):
     global parser, gui_main
     user_info.set("form", "tab", gui.select_tab.currentText())
   
-@timed_try_wrapper
-def count_unid_rares(gui, force_recache:bool=False)->list[list, int]:
-    global refresh_off_cooldown, parser
+def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->dict:
+    """Function to count unidentified rare items of ilevel
+
+    Args:
+        gui (_type_): gui object used for display and update
+        force_recache (bool, optional): force a fresh fetch for POE. Defaults to False.
+
+    Returns:
+        dict: returns list of count %s (0-100)
+    """
+    # TODO REMOVE GLOBAL REFERENCE 
+    global refresh_off_cooldown
     league_of_interest = gui.select_league.currentText()
 
     # put the manual refresh button on cooldown
@@ -265,23 +274,23 @@ def count_unid_rares(gui, force_recache:bool=False)->list[list, int]:
     try:
         # tab_of_interes
         tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
-        print("tabs_of_interest>",type(tabs_of_interest))
+        # print("tabs_of_interest>",type(tabs_of_interest))
 
         # list of items
         items_of_interest = parser.get_items(tabs_of_interest, league_of_interest, force_recache)
-        print("items_of_interest>",type(items_of_interest))
+        # print("items_of_interest>",type(items_of_interest))
 
         # filter for unid
         items_unidentified = parser.filter_identified(items_of_interest)
-        print("items_unidentified>",items_unidentified)
+        # print("items_unidentified>",items_unidentified)
 
         # filter for ilevel
-        items_unidentified_ilvl = parser.filter_ilvl(items_unidentified)
-        print("items_unidentified_ilvl>",items_unidentified_ilvl)
+        items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
+        # print("items_unidentified_ilvl>",items_unidentified_ilvl)
 
         # filter for rares
         items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
-        print("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
+        # print("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
         
         # loop and count unids
         count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
@@ -289,23 +298,34 @@ def count_unid_rares(gui, force_recache:bool=False)->list[list, int]:
 
         # Set scales and mutlipliers
         target = gui.sets_target.value()
-        multiplier = 100//target
+        multiplier = 100/target
+
+        # convert counts to %
+        count["Weapon"] = round(min(100,(count["Weapon"]*multiplier)//2))
+        count["Ring"] = round(min(100,(count["Ring"]*multiplier)//2))
+        
+        count["Helmet"] = round(min(100,count["Helmet"]*multiplier))
+        count["Body Armour"] = round(min(100,count["Body Armour"]*multiplier))
+        count["Boots"] = round(min(100,count["Boots"]*multiplier))
+        count["Gloves"] = round(min(100,count["Gloves"]*multiplier))
+        count["Belt"] = round(min(100,count["Belt"]*multiplier))
+        count["Amulet"] = round(min(100,count["Amulet"]*multiplier))
+        
 
         # set GUI element values
-        gui_main.count_weapons.setValue(count["Weapon"]*multiplier)
-        gui_main.count_helmets.setValue(count["Helmet"]*multiplier)
-        gui_main.count_bodies.setValue(count["Body Armor"]*multiplier)
-        gui_main.count_boots.setValue(count["Boot"]*multiplier)
-        gui_main.count_gloves.setValue(count["Glove"]*multiplier)
-        gui_main.count_belts.setValue(count["Belt"]*multiplier)
-        gui_main.count_amulets.setValue(count["Amulet"]*multiplier)
-        gui_main.count_rings.setValue((count["Ring"]*multiplier)//2)
+        gui_main.count_weapons.setValue(count["Weapon"])
+        gui_main.count_helmets.setValue(count["Helmet"])
+        gui_main.count_bodies.setValue(count["Body Armour"])
+        gui_main.count_boots.setValue(count["Boots"])
+        gui_main.count_gloves.setValue(count["Gloves"])
+        gui_main.count_belts.setValue(count["Belt"])
+        gui_main.count_amulets.setValue(count["Amulet"])
+        gui_main.count_rings.setValue(count["Ring"])
         
         # report
-        return [count, target]
+        return count
     except Exception as e:
-        t = str(time.time())[-1:]
-        gui.count_report_string.setText("ERR:"+str(e)+f"[{t}]")
+        print(timestamp(),"count_unid_rares() Error:"+str(e))
         return [False, False]
 
 def async_two():
@@ -337,12 +357,13 @@ def log_search():
         # print("Last modified: %s" % time.ctime(modified))
         # gui_main.count_report_string.setText("Reading...")
         stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+        # TODO rebuild this to always look only at X recent lines for speed
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
                 if stamp in line and snippet in line:
                         print(line)
                         gui_main.count_report_string.setText(line[78:])
-                        count_unid_rares(gui_main)
+                        update_item_filter(gui_main, parser)
                         return
         # gui_main.count_report_string.setText("Reading... Done")
 
@@ -380,7 +401,6 @@ def pick_color(gui, target_object, save_name):
         user_info.set("form", save_name, new_color.name())
         user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
         target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
-        update_item_filter(gui)
 
 def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return_string = ""
@@ -390,16 +410,22 @@ def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return return_string
 
 @timed_try_wrapper
-def update_item_filter(gui):
+def update_item_filter(gui, parser, force_recache:bool=False):
     global gui_main
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
     path = user_info.cfg.get("form","filter_name")
     mode = gui_main.filter_mode.currentText()
-    slot_count, target = count_unid_rares(gui)
+    target = 100  # 100% of the goal
+    slot_count_percent = count_unid_rares(gui, parser, force_recache)
+
+    # exit case if we don't have a parser object yet
+    if not parser or not isinstance(parser, poepy.DataParser):
+        return False
 
     # exit case for when counts could not be found
-    if not slot_count:
+    if not slot_count_percent:
+        print(f"Failed to recieve item counts [slot_count = {slot_count_percent}]")
         return False
 
     # read data without mod section
@@ -417,21 +443,23 @@ def update_item_filter(gui):
     # rebuild filter text adding back in slots as needed   
     prefix = header
     if "Disabled" not in mode:
-        print(slot_count)
-        if slot_count["Weapon"] >= target:
-            prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapons_rgb"),width="= 1").to_str()
-        if slot_count["Helmet"] >= target:
-            prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmets_rgb")).to_str()
-        if slot_count["Body Armor"] >= target:
-            prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_bodies_rgb")).to_str()   
-        if slot_count["Boot"] >= target:
-            prefix += poepy.ItemFilterEntry("Boot",user_info.cfg.get("form","color_boots_rgb")).to_str()
-        if slot_count["Glove"] >= target:
-            prefix += poepy.ItemFilterEntry("Glove",user_info.cfg.get("form","color_gloves_rgb")).to_str()
-        if slot_count["Amulet"] >= target:
-            prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulets_rgb")).to_str()
-        if slot_count["Ring"] >= target:
-            prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_rings_rgb")).to_str()
+        print(slot_count_percent)
+        if slot_count_percent["Weapon"] < target:
+            prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapon_rgb"),width="= 1").to_str()
+        if slot_count_percent["Helmet"] < target:
+            prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmet_rgb")).to_str()
+        if slot_count_percent["Body Armour"] < target:
+            prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_body_armour_rgb")).to_str()   
+        if slot_count_percent["Boots"] < target:
+            prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
+        if slot_count_percent["Gloves"] < target:
+            prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
+        if slot_count_percent["Belt"] < target:
+            prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgb")).to_str()          
+        if slot_count_percent["Amulet"] < target:
+            prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgb")).to_str()          
+        if slot_count_percent["Ring"] < target:
+            prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgb")).to_str()
     prefix += footer
 
     # write
@@ -439,7 +467,11 @@ def update_item_filter(gui):
         f.write(prefix+current_filter)
     
     # announce update
-    gui_main.count_report_string.setText("Filter updated . . .")
+    t = timestamp()
+    n =  os.path.split(path)[1]
+    txt = f"{t} '{n}' updated!"
+    print(txt)
+    gui_main.count_report_string.setText(txt)
             
 @timed_try_wrapper
 def request_client_secret():
@@ -458,13 +490,17 @@ def change_target_count(gui):
     user_info.set("form","sets_goal", str(gui.sets_target.value()))
 
 if __name__ == "__main__":
-    # load user file
-    user_info.load()
-
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon
     # https://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7/1552105#1552105
     myappid = u'chipy.PoE.chaos.tool' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+    # load user file
+    user_info.load()
+
+    # build the api/parser object
+    api = poepy.PoeApiHandler()
+    parser = poepy.DataParser(api_handler = api)
 
     # build main GUI
     app = QApplication(sys.argv)
@@ -475,7 +511,7 @@ if __name__ == "__main__":
     gui_main.setupUi(MainWindow)
 
     # Modify the gui with connections and links
-    apply_ui_connections(gui_main)  # here we modify actions to the GUI
+    apply_ui_connections(gui_main, parser)  # here we modify actions to the GUI
     apply_ui_defaults(gui_main, MainWindow, app)  # set default values for the form when it's made
 
     # run app as the last thing in the script

@@ -52,7 +52,10 @@ PROCESS
 """
 
 class PoeApiHandler():
-    def __init__(self, 
+    def __init__(self) -> None:
+        self.connected = False
+
+    def connect(self, 
                  client_id, 
                  client_secret, 
                  uri, 
@@ -73,6 +76,7 @@ class PoeApiHandler():
         if manual_token:
             self._update_header_token(manual_token)
         self._authenticate(force_re_auth)
+        self.connect = True
         print( "done")
         
 
@@ -234,6 +238,23 @@ class DataParser():
         self.league = league
         self.cached = {"DEFAULT_VALUE":0}
 
+    def connect(self,
+                client_id, 
+                client_secret, 
+                uri, 
+                scope="account:profile", 
+                force_re_auth:bool=False, 
+                manual_token:str=None):
+        self.api_handler.connect(client_id=client_id, 
+                                 client_secret=client_secret, 
+                                 uri=uri, 
+                                 scope=scope, 
+                                 force_re_auth=force_re_auth, 
+                                 manual_token=manual_token)
+    
+    def connection_precheck(self):
+        return self.api_handler.connected
+
     def _cache_stash(self, league:str,force_recache:bool=False):
         """Caches the list of tabs in a league's stash |get_leagues(self) -> list:|
             {'id': 'fae1b5d2ef', 
@@ -245,6 +266,8 @@ class DataParser():
         Args:
             league (str): league name as 
         """
+
+
         if league+"_stash_response" not in self.cached or force_recache:
             print("Caching "+league+"_stash")
             self.cached[league+"_stash_response"] = self.api_handler.get_stash(league)
@@ -460,7 +483,7 @@ class ItemFilterEntry():
                     if any(op in value for op in ["<",">","="]):
                         out_line = "\t%s %s\n" % (key, value)
                     elif any(t in key for t in ["Class"]):
-                        if value == "Weapons":
+                        if value == "Weapon":
                             out_line = '\t%s %s\n' % (key, self._class_list_to_string(WEAPON_LIST))
                         else:
                             out_line = '\t%s "%s"\n' % (key, value)
@@ -506,9 +529,9 @@ def count_slots(parser:DataParser, list_of_items:list, include_all_unid:bool=Fal
     counts={"Total":0,
             "Weapon":0,
             "Helmet":0,
-            "Body Armor":0,
-            "Boot":0,
-            "Glove":0,
+            "Body Armour":0,
+            "Boots":0,
+            "Gloves":0,
             "Belt":0,
             "Amulet":0,
             "Ring":0}
