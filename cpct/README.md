@@ -95,6 +95,14 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 [ ] Rebuild item reading system into ENUM to easy class changes
 [ ] Add 2-H weapon options to filter
 [ ] Add league and tab memory
+[ ] Add never hide rings/ammy options
+[ ] Add sets ready counters (with ilvl checking)
+[ ] Add feature to indicate next items
+[ ] Fix auto refresh not renewing the list in the GUI display
+[ ] Add auto check limiter to read and log last checked zone entry
+[ ] Fix GUI and regal filter to be i75 (not 70)
+[ ] Write for Steam Version and path options!
+ 
 
 ## License
 `cpct` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
