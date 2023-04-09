@@ -92,6 +92,7 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 [ ] Integration with FilterBlade filters (rather than just added it's own)
 [ ] Integration with Online filters (if possible)
 [ ] Additional filter color/font/size customization options
+[ ] Add alpha slider to picker
 [ ] Rebuild item reading system into ENUM to easy class changes
 [ ] Add 2-H weapon options to filter
 [ ] Add league and tab memory
@@ -102,6 +103,7 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 [ ] Add auto check limiter to read and log last checked zone entry
 [ ] Fix GUI and regal filter to be i75 (not 70)
 [ ] Write for Steam Version and path options!
+
  
 
 ## License

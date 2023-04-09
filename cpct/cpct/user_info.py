@@ -3,6 +3,7 @@ import configparser
 import os
 
 # const
+BASE_RGB = "0, 255, 255"
 CFG_FILENAME = r"user_settings.cfg"
 # CFG info
 cfg = configparser.ConfigParser()
@@ -20,22 +21,22 @@ def load():
                    "league":"standard",
                    "tab":"1",
                    "sets_goal":"4",
-                   "color_weapon":"#00ffff",
-                   "color_weapon_rgb":"[0, 255, 255, 235]",
-                   "color_helmet":"#00ffff",
-                   "color_helmet_rgb":"[0, 255, 255, 210]",
-                   "color_gloves":"#00ffff",
-                   "color_gloves_rgb":"[0, 255, 255, 210]",
-                   "color_ring":"#00ffff",
-                   "color_ring_rgb":"[0, 255, 255, 255]",
-                   "color_amulet":"#00ffff",
-                   "color_amulet_rgb":"[0, 255, 255, 255]",
-                   "color_body_armour":"#00ffff",
-                   "color_body_armour_rgb":"[0, 255, 255, 150]",
-                   "color_boots":"#00ffff",
-                   "color_boots_rgb":"[0, 255, 255, 210]",
-                   "color_belt":"#00ffff",
-                   "color_belt_rgb":"[0, 255, 255, 235]",                   
+                #    "color_weapon":"#00ffff",
+                   "color_weapon_rgba":"["+BASE_RGB+", 235]",
+                #    "color_helmet":"#00ffff",
+                   "color_helmet_rgba":"["+BASE_RGB+", 210]",
+                #    "color_gloves":"#00ffff",
+                   "color_gloves_rgba":"["+BASE_RGB+", 210]",
+                #    "color_ring":"#00ffff",
+                   "color_ring_rgba":"["+BASE_RGB+", 255]",
+                #    "color_amulet":"#00ffff",
+                   "color_amulet_rgba":"["+BASE_RGB+", 255]",
+                #    "color_body_armour":"#00ffff",
+                   "color_body_armour_rgba":"["+BASE_RGB+", 150]",
+                #    "color_boots":"#00ffff",
+                   "color_boots_rgba":"["+BASE_RGB+", 210]",
+                #    "color_belt":"#00ffff",
+                   "color_belt_rgba":"["+BASE_RGB+", 235]",                   
                    }
 
 
@@ -47,15 +48,17 @@ def load():
                   }
     cfg.read(CFG_FILENAME)
 
-def get(section:str, key:str) -> str:
-    return cfg.get(section, key, fallback="MISSING")
+def get(section:str, key:str):
+    result = cfg.get(section, key, fallback="MISSING")
+    if "[" in result:
+        return result[1:-1].split(",")
+    return result
 
 def set(section:str, key:str, value:str):
     cfg[section][key] = value
     save()
 
 if __name__ == "__main__":
-    print(get("api","client_id"))
     load()
-    print(get("api","client_id"))
-    save()
+    print(type(get("form","color_amulet_rgb")))
+    print(get("form","color_amulet_rgb"))

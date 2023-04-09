@@ -118,14 +118,14 @@ def apply_ui_defaults(gui_obj, window_obj, app_obj):
     gui_obj.sets_target.setValue(int(user_info.get("form", "sets_goal")))
 
     # set previous colours
-    gui_obj.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulet")))
-    gui_obj.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_belt")))
-    gui_obj.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_body_armour")))
-    gui_obj.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots")))
-    gui_obj.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves")))
-    gui_obj.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmet")))
-    gui_obj.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_ring")))
-    gui_obj.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapon")))
+    gui_obj.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulet_rgba")))
+    gui_obj.count_belts.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_belt_rgba")))
+    gui_obj.count_bodies.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_body_armour_rgba")))
+    gui_obj.count_boots.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_boots_rgba")))
+    gui_obj.count_gloves.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_gloves_rgba")))
+    gui_obj.count_helmets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_helmet_rgba")))
+    gui_obj.count_rings.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_ring_rgba")))
+    gui_obj.count_weapons.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_weapon_rgba")))
 
     # defaults for item_filter modes
     gui_obj.filter_mode.addItems(["Default","FilterBlade","Custom","Disabled"])
@@ -137,14 +137,14 @@ def apply_ui_connections(gui_obj, parser):
         gui_obj (gui.Ui_MainWindow): Main window GUI object
     """
     # Link ColorPickers
-    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulet"))
-    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belt"))
-    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_body_armour"))
-    gui_obj.color_link_boots.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_boots, "color_boots"))
-    gui_obj.color_link_gloves.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_gloves, "color_gloves"))
-    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmet"))
-    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_ring"))
-    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapon"))
+    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulet_rgba"))
+    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belt_rgba"))
+    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_body_armour_rgba"))
+    gui_obj.color_link_boots.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_boots, "color_boots_rgba"))
+    gui_obj.color_link_gloves.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_gloves, "color_gloves_rgba"))
+    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmet_rgba"))
+    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_ring_rgba"))
+    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapon_rgba"))
 
     # # link menus
     gui_obj.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
@@ -392,18 +392,27 @@ def receive_client_secret(gui):
 
 @timed_try_wrapper
 def pick_color(gui, target_object, save_name):
-    current_color = QtGui.QColor(user_info.get("form", save_name))
+    rgba = user_info.get("form", save_name)
+    print(type(rgba),rgba)
+    current_color = QtGui.QColor(int(rgba[0]),int(rgba[1]),int(rgba[2]),int(rgba[3]))
     new_color = QColorDialog.getColor(current_color, title=f"Pick a new color for {save_name}")
     if new_color.isValid():
-        user_info.set("form", save_name, new_color.name())
-        user_info.set("form", save_name+"_rgb", str(list(new_color.getRgb())))
-        target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
+        new_rgba = list(new_color.getRgb())
+        user_info.set("form", save_name, str(new_rgba))
+        target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_rgba))
+        print(type(new_rgba),new_rgba)
 
-def style_sheet_new_color(base_style:str,new_color:str) -> str:
+def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
+    def rgba_t0_hex(rgba:list) -> str:
+        r = hex(int(rgba[0]))[2:] 
+        g = hex(int(rgba[1]))[2:]
+        b = hex(int(rgba[2]))[2:]
+        return f"#{r.zfill(2)}{g.zfill(2)}{b.zfill(2)}"
     return_string = ""
+    new_hex_color = rgba_t0_hex(new_rgba_color)
     i = base_style.find("background-color: ")
     current_color = base_style[i+18:i+25]
-    return_string = base_style.replace(current_color, new_color) 
+    return_string = base_style.replace(current_color, new_hex_color) 
     return return_string
 
 @timed_try_wrapper
@@ -447,21 +456,21 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     if "Disabled" not in mode:
         print(slot_count_percent)
         if slot_count_percent["Weapon"] < target:
-            prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapon_rgb"),width="= 1").to_str()
+            prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapon_rgba"),width="= 1").to_str()
         if slot_count_percent["Helmet"] < target:
-            prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmet_rgb")).to_str()
+            prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmet_rgba")).to_str()
         if slot_count_percent["Body Armour"] < target:
-            prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_body_armour_rgb")).to_str()   
+            prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_body_armour_rgba")).to_str()   
         if slot_count_percent["Boots"] < target:
-            prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgb")).to_str()
+            prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgba")).to_str()
         if slot_count_percent["Gloves"] < target:
-            prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
+            prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgba")).to_str()
         if slot_count_percent["Belt"] < target:
-            prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgb")).to_str()          
+            prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgba")).to_str()          
         if always_show_amulets or slot_count_percent["Amulet"] < target:
-            prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgb")).to_str()          
+            prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgba")).to_str()          
         if always_show_rings or slot_count_percent["Ring"] < target:
-            prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgb")).to_str()
+            prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgba")).to_str()
     prefix += footer
 
     # write
