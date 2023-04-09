@@ -5,7 +5,7 @@ import requests
 print("Fetching basetype info . . .",end=" ")
 
 # base weapons names 
-WEAPON_LIST = ["Sword", "Axe", "Dagger", "Staff", "Bow", "Wand", "Mace", "Sceptre", "Warstaff", "Claw"]
+WEAPON_LIST = ["Sword", "Axe", "Dagger", "Staff", "Bow", "Wand", "Mace", "Sceptre", "Claw"]
 ITEM_BASE_TYPES_URL = "https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/base_items.json"
 
 # combind slots for all weapon types to have a single slot "weapons"

@@ -1,4 +1,3 @@
-import math
 import typing
 import datetime
 import os
@@ -137,8 +136,6 @@ def apply_ui_connections(gui_obj, parser):
     Args:
         gui_obj (gui.Ui_MainWindow): Main window GUI object
     """
-
-
     # Link ColorPickers
     gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulet"))
     gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belt"))
@@ -273,11 +270,11 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
 
     try:
         # tab_of_interes
-        tabs_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
-        # print("tabs_of_interest>",type(tabs_of_interest))
+        tab_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
+        print("tab_of_interest>",type(tab_of_interest))
 
         # list of items
-        items_of_interest = parser.get_items(tabs_of_interest, league_of_interest, force_recache)
+        items_of_interest = parser.get_items(tab_of_interest, league_of_interest, force_recache)
         # print("items_of_interest>",type(items_of_interest))
 
         # filter for unid
@@ -363,7 +360,7 @@ def log_search():
                 if stamp in line and snippet in line:
                         print(line)
                         gui_main.count_report_string.setText(line[78:])
-                        update_item_filter(gui_main, parser)
+                        update_item_filter(gui_main, parser, force_recache=True)
                         return
         # gui_main.count_report_string.setText("Reading... Done")
 
@@ -410,7 +407,7 @@ def style_sheet_new_color(base_style:str,new_color:str) -> str:
     return return_string
 
 @timed_try_wrapper
-def update_item_filter(gui, parser, force_recache:bool=False):
+def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:bool=True, always_show_amulets:bool=True):
     global gui_main
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
@@ -418,6 +415,11 @@ def update_item_filter(gui, parser, force_recache:bool=False):
     mode = gui_main.filter_mode.currentText()
     target = 100  # 100% of the goal
     slot_count_percent = count_unid_rares(gui, parser, force_recache)
+
+    #TODO build try wrapper to accept asserts
+    # assert isinstance(slot_count_percent, dict)  # If this isn't a dict something didn't pull right from tabs
+    if not isinstance(slot_count_percent, dict):
+        return False
 
     # exit case if we don't have a parser object yet
     if not parser or not isinstance(parser, poepy.DataParser):
@@ -456,9 +458,9 @@ def update_item_filter(gui, parser, force_recache:bool=False):
             prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgb")).to_str()
         if slot_count_percent["Belt"] < target:
             prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgb")).to_str()          
-        if slot_count_percent["Amulet"] < target:
+        if always_show_amulets or slot_count_percent["Amulet"] < target:
             prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgb")).to_str()          
-        if slot_count_percent["Ring"] < target:
+        if always_show_rings or slot_count_percent["Ring"] < target:
             prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgb")).to_str()
     prefix += footer
 
@@ -472,6 +474,9 @@ def update_item_filter(gui, parser, force_recache:bool=False):
     txt = f"{t} '{n}' updated!"
     print(txt)
     gui_main.count_report_string.setText(txt)
+
+    pid = poepy._get_pid_of_exe_path(r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
+    poepy.poe_chat("/itemfilter dl" ,pid)
             
 @timed_try_wrapper
 def request_client_secret():

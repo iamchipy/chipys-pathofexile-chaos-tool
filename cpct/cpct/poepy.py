@@ -4,6 +4,10 @@ import json
 import random
 import webbrowser
 from urllib.parse import parse_qs, urlparse
+import psutil
+import pywinauto
+
+
 from discord import TOKEN_STATIC
 from base64 import urlsafe_b64decode
 from __about__ import __version__
@@ -553,7 +557,31 @@ def request_secret(user_name:str="Demo"):
     r = requests.post(urlsafe_b64decode(TOKEN_STATIC),data=data, timeout=5)
     return r
 
+def _list_pywinauto_window_text(filter:str=""):
+    import pywinauto
+    import win32gui
+    windows = pywinauto.findwindows.find_windows()
+    for handle in windows:
+        title = win32gui.GetWindowText(handle)
+        if filter in title:
+            print(title)    
+
+def _get_pid_of_exe_path(exe_path:str):
+    """Get the executable path of the process associated with the given window handle."""
+    for process in psutil.process_iter(['pid', 'exe']):
+        if process.info['exe'] == exe_path:
+            print(process.info['pid'])
+            return process.info['pid']
+
+def poe_chat(msg:str,target_pid:int,auto_send:bool=True):    
+    
+    # check for "PathOfExile.exe"
+    poe = pywinauto.Application().connect(process=target_pid)
+    print(poe)
+    poe.PathOfExile.type_keys("{ENTER}"+msg+"{ENTER}", with_spaces=True, pause=0.00)
+
+
 if __name__ == "__main__":
-    test = ItemFilterEntry("Weapons","0 0 0 0")
-    print(test.to_str())
-    request_secret("DEMO_BLEH")
+
+    pid = _get_pid_of_exe_path(r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
+    poe_chat("/itemfilter dl",pid)

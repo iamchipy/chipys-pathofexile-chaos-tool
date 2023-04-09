@@ -6,7 +6,7 @@ installDependencyErrors = 0
 installDependencyMessage = ""
 
 # List of packages to install with pip
-dependenciesInstall = ["requests","PyQt5", "websockets"]
+dependenciesInstall = ["requests","PyQt5", "websockets", "pywinauto", "psutil"]
 
 # List of packages to update with pip
 dependenciesUpdate = ["PyQt5"]
