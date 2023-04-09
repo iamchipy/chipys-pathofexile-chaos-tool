@@ -137,14 +137,14 @@ def apply_ui_connections(gui_obj, parser):
         gui_obj (gui.Ui_MainWindow): Main window GUI object
     """
     # Link ColorPickers
-    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulet_rgbaa"))
-    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belt_rgbaa"))
-    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_body_armour_rgbaa"))
-    gui_obj.color_link_boots.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_boots, "color_boots_rgbaa"))
-    gui_obj.color_link_gloves.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_gloves, "color_gloves_rgbaa"))
-    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmet_rgbaa"))
-    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_ring_rgbaa"))
-    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapon_rgbaa"))
+    gui_obj.color_link_amulets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_amulets, "color_amulet_rgba"))
+    gui_obj.color_link_belts.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_belts, "color_belt_rgba"))
+    gui_obj.color_link_bodies.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_bodies, "color_body_armour_rgba"))
+    gui_obj.color_link_boots.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_boots, "color_boots_rgba"))
+    gui_obj.color_link_gloves.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_gloves, "color_gloves_rgba"))
+    gui_obj.color_link_helmets.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_helmets, "color_helmet_rgba"))
+    gui_obj.color_link_rings.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_rings, "color_ring_rgba"))
+    gui_obj.color_link_weapons.clicked.connect(lambda: pick_color(gui_obj, gui_obj.count_weapons, "color_weapon_rgba"))
 
     # # link menus
     gui_obj.actionChipy_dev.triggered.connect(lambda: webbrowser.open("www.chipy.dev/me.html"))
@@ -393,19 +393,21 @@ def receive_client_secret(gui):
 @timed_try_wrapper
 def pick_color(gui, target_object, save_name):
     rgba = user_info.get("form", save_name)
-    current_color = QtGui.QColor(*rgba)
+    print(type(rgba),rgba)
+    current_color = QtGui.QColor(int(rgba[0]),int(rgba[1]),int(rgba[2]),int(rgba[3]))
     new_color = QColorDialog.getColor(current_color, title=f"Pick a new color for {save_name}")
     if new_color.isValid():
-        user_info.set("form", save_name, new_color.name())
-        user_info.set("form", save_name+"_rgba", str(list(new_color.getRgb())))
-        target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_color.name()))
+        new_rgba = list(new_color.getRgb())
+        user_info.set("form", save_name, str(new_rgba))
+        target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_rgba))
+        print(type(new_rgba),new_rgba)
 
 def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
     def rgba_t0_hex(rgba:list) -> str:
-        r = hex(rgba[0])[2:]
-        g = hex(rgba[1])[2:]
-        b = hex(rgba[2])[2:]
-        return f"#{r}{g}{b}"
+        r = hex(int(rgba[0]))[2:] 
+        g = hex(int(rgba[1]))[2:]
+        b = hex(int(rgba[2]))[2:]
+        return f"#{r.zfill(2)}{g.zfill(2)}{b.zfill(2)}"
     return_string = ""
     new_hex_color = rgba_t0_hex(new_rgba_color)
     i = base_style.find("background-color: ")

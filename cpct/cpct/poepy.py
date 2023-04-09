@@ -446,7 +446,7 @@ class DataParser():
 class ItemFilterEntry():
     def __init__(self, 
                  _class:str,
-                 bg_color:str,
+                 bg_color:list,
                  ilvl:str=">= 60",
                  width:str="<= 2",
                  height:str="<= 3" ,
@@ -468,6 +468,9 @@ class ItemFilterEntry():
         # self.MinimapIcon = "2 White Star"
         # self.CustomAlertSound = '"1maybevaluable.mp3" 300'
         # self.PlayEffect = "Red"
+
+        if isinstance(bg_color,list):
+            self.SetBackgroundColor = f"{bg_color[0]} {bg_color[1]} {bg_color[2]} {bg_color[3]}"
 
     def _class_list_to_string(self, incoming_list:list):
         result = ""
