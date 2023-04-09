@@ -505,6 +505,48 @@ class ItemFilterEntry():
             out_str += out_line
         return out_str
 
+class PoEItemWrapper():
+    def __init__(self, poe_item) -> None:
+
+        # save raw data
+        self.raw = poe_item
+        if isinstance(poe_item, str):
+            self.raw = json.loads(poe_item)
+        
+        # extract info we care about
+        self.x =self.raw["frameType"]
+        self.y =self.raw["frameType"]
+        self.w =self.raw["frameType"]
+        self.h =self.raw["frameType"]
+        self.rarity = self.raw["frameType"]
+        self.identified = self.raw["identified"]
+        self.slot = self.raw["class"]  # TODO have this lookup through basetypes
+
+    def coords(self):
+        return "xy top left coords in grid"
+    
+    def size(self):
+        return "dimentions"
+    
+class SetHandler():
+    def __init__(self, list_of_items:list) -> None:
+        self.list_of_items = list_of_items
+        self._tally_slots()
+        self.sort_items_into_slots(self.list_of_items)
+        pass
+
+    def is_complete(self):
+        return "tru if all slots filled"
+    
+    def _tally_slots(self):
+        for item in self.list_of_items:
+            self.
+
+    def sort_items_into_slots(self, list_of_items):
+        for item in list_of_items:
+            pass
+            # if duplicates exit etc
+    
 def validate_league(parser:DataParser, user_input:str=None):
     active_leagues = parser.get_leagues()
     if not user_input:

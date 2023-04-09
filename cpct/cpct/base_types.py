@@ -28,7 +28,6 @@ SLOT_LOOKUP = dict([slot_sub(k,v) for k,v in BASE_TYPES.items()])
 SLOT_LIST = {v[1] for v in SLOT_LOOKUP.items()}
 
 # TODO reduce excess string check by narrowing down this list 
-"""Body Armour"""
 WEAPON_CLASSES = [v for v in BASE_TYPES.items() if any(item in v for item in WEAPON_LIST)]
 
 print("done")
