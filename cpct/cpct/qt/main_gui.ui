@@ -451,6 +451,9 @@ QProgressBar::chunk {
     <property name="statusTip">
      <string>Number of sets to be collecting (for show progress)</string>
     </property>
+    <property name="minimum">
+     <number>2</number>
+    </property>
     <property name="value">
      <number>8</number>
     </property>
@@ -539,7 +542,7 @@ QProgressBar::chunk {
    </widget>
    <widget class="QLabel" name="item_2">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -561,7 +564,7 @@ QProgressBar::chunk {
    </widget>
    <widget class="QRadioButton" name="recipe_chaos">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -592,7 +595,7 @@ QProgressBar::chunk {
    </widget>
    <widget class="QRadioButton" name="recipe_regal">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -612,7 +615,7 @@ QProgressBar::chunk {
      <string>Regal Recipe: Unidentified set of all items iLevel +70</string>
     </property>
     <property name="text">
-     <string>Regal (i70+)</string>
+     <string>Regal (i75+)</string>
     </property>
     <attribute name="buttonGroup">
      <string notr="true">recipe_type</string>
@@ -1226,6 +1229,7 @@ QProgressBar::chunk {
     </property>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -1256,6 +1260,7 @@ QProgressBar::chunk {
      <string>Settings</string>
     </property>
     <addaction name="actionInput_ClientSecret"/>
+    <addaction name="actiondev_button"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -1269,7 +1274,6 @@ QProgressBar::chunk {
    <addaction name="menuLinks"/>
    <addaction name="menuAbout"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionFilterblade_xyz">
    <property name="text">
     <string>Filterblade.xyz</string>
@@ -1341,6 +1345,11 @@ QProgressBar::chunk {
   <action name="action_NOT_AFFILIATED_WITH_ANY">
    <property name="text">
     <string>*NOT AFFILIATED</string>
+   </property>
+  </action>
+  <action name="actiondev_button">
+   <property name="text">
+    <string>dev_button</string>
    </property>
   </action>
  </widget>

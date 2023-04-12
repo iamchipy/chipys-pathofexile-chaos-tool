@@ -2,11 +2,12 @@ import asyncio
 import hashlib
 import json
 import random
+import time
 import webbrowser
 from urllib.parse import parse_qs, urlparse
 import psutil
 import pywinauto
-
+import pyautogui
 
 from discord import TOKEN_STATIC
 from base64 import urlsafe_b64decode
@@ -304,12 +305,16 @@ class DataParser():
         name_match = []
         prioritize_name = len(search_str) != 10
 
+        # handle when search is a tuple from Find_STash()
+        if isinstance(search_str, tuple):
+            search_str = search_str[1]
+
         # search stashes for a match
         for tab in self.cached[league+"_stash"]:
             # check for any partial match
             if search_str in tab["name"] or search_str in tab["id"]:
                 # load into variable 
-                last_match = (tab["name"],tab["id"])
+                last_match = (tab["name"],tab["id"],tab["type"])
                 # print("something:", last_match)
                 # full match return right away
                 if search_str == tab["name"] or search_str == tab["id"]:
@@ -343,6 +348,13 @@ class DataParser():
             self.cached[league+"_"+stash_id] = raw
         return self.cached[league+"_"+stash_id]
 
+    def get_tab_type(self,tab_of_interest, league_of_interest, force_recache:bool=False):
+
+        tab_info = self.find_tab(tab_of_interest, league_of_interest)
+        # tab = self.cached[f"{league_of_interest}_{tab_id}"]
+        print(tab_info)
+        return tab_info[2]
+
     def _parse_item_names(self, tab:dict) -> list:
         # print(tab)
         # print(type(tab))
@@ -362,7 +374,7 @@ class DataParser():
         if isinstance(stash_id, bool):
             return False
         # handle when Stash_ID is the name/ID tuple
-        if isinstance(stash_id,tuple) and len(stash_id)==2:
+        if isinstance(stash_id,tuple) and len(stash_id)==3:
             stash_id=stash_id[1]
         # Handle when you are given a list of StashID
         if isinstance(stash_id,list):
@@ -513,14 +525,19 @@ class PoEItemWrapper():
         if isinstance(poe_item, str):
             self.raw = json.loads(poe_item)
         
+        # print(self.raw)
+        """{'verified': False, 'w': 2, 'h': 2, 'icon': 'https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQXJtb3Vycy9Cb290cy9Cb290c1N0ckRleDMiLCJ3IjoyLCJoIjoyLCJzY2FsZSI6MX1d/3418ad050e/BootsStrDex3.png', 'league': 'Crucible', 'id': '0cd21f0cab26e2c7f2e8f6291cb289af14c8d2ae6ccfaf2f5b22dcfac3766c97', 'sockets': [{'group': 0, 'attr': 'D', 'sColour': 'G'}, {'group': 1, 'attr': 'S', 'sColour': 'R'}], 'name': '', 'typeLine': 'Wyrmscale Boots', 'baseType': 'Wyrmscale Boots', 'identified': False, 'ilvl': 85, 'properties': [{'name': 'Armour', 'values': [['98', 0]], 'displayMode': 0, 'type': 16}, {'name': 'Evasion Rating', 'values': [['98', 0]], 'displayMode': 0, 'type': 17}], 'requirements': [{'name': 'Str', 'values': [['48', 0]], 'displayMode': 1, 'type': 63}, {'name': 'Dex', 'values': [['48', 0]], 'displayMode': 1, 'type': 64}], 'frameType': 2, 'x': 16, 'y': 12, 'inventoryId': 'Stash1', 'socketedItems': []}"""
+        
         # extract info we care about
-        self.x =self.raw["frameType"]
-        self.y =self.raw["frameType"]
-        self.w =self.raw["frameType"]
-        self.h =self.raw["frameType"]
+        self.hash = self.raw["id"]
+        self.x = self.raw["x"]
+        self.y = self.raw["y"]
+        self.w = self.raw["w"]
+        self.h = self.raw["h"]
         self.rarity = self.raw["frameType"]
         self.identified = self.raw["identified"]
-        self.slot = self.raw["class"]  # TODO have this lookup through basetypes
+        self.ilvl = self.raw["ilvl"]
+        self.slot = SLOT_LOOKUP.get(self.raw["baseType"], "Unknown")
 
     def coords(self):
         return "xy top left coords in grid"
@@ -528,24 +545,134 @@ class PoEItemWrapper():
     def size(self):
         return "dimentions"
     
-class SetHandler():
+class RecipeHandler():
+    RECIPE = {"Weapon":4,
+              "Helmet":2,
+              "Body Armour":2,
+              "Boots":2,
+              "Gloves":2,
+              "Belt":2,
+              "Amulet":2,
+              "Ring":4}    
     def __init__(self, list_of_items:list) -> None:
-        self.list_of_items = list_of_items
+        print("Init RecipeHandler...", end="")
+        self.assigned_hashes = []
+        self.ready_recipes = []
+        self.slot_count= {"Weapon":0,
+                          "Helmet":0,
+                          "Body Armour":0,
+                          "Boots":0,
+                          "Gloves":0,
+                          "Belt":0,
+                          "Amulet":0,
+                          "Ring":0,
+                          "Unknown":0}
+        self.quad_1440 = StashGrid([18,175,866,1023])  # TODO fix static values
+        print("Done")
+        self.list_of_items = self.simplify_items(list_of_items)
+        print("Tallying slots...")
         self._tally_slots()
-        self.sort_items_into_slots(self.list_of_items)
-        pass
+        print("Init_count:",self.slot_count)
+        self.display_stash_locations()
 
-    def is_complete(self):
-        return "tru if all slots filled"
-    
     def _tally_slots(self):
         for item in self.list_of_items:
-            self.
+            self.slot_count[item.slot] +=1
 
-    def sort_items_into_slots(self, list_of_items):
-        for item in list_of_items:
-            pass
-            # if duplicates exit etc
+    def _fetch_item(self, 
+                    slot:str, 
+                    ilevel:int=60, 
+                    identified:bool=False, 
+                    frame_type:int=FRAMETYPE_RARE):
+        for item in self.list_of_items:
+            # check if hash has been assigned
+            if item.hash in self.assigned_hashes:
+                continue
+            # check if item matches desired details
+            if item.slot == slot and item.ilvl >= ilevel and item.identified == identified and item.rarity == frame_type:
+                self.assigned_hashes.append(item.hash)
+                return item
+        return None
+
+    def _collect_ingredients(self, ilevel:int=60, identified:bool=False, frame_type:int=FRAMETYPE_RARE):
+        ingredients = {}
+        for ingredient, quantity in self.RECIPE.items():
+            for index in range(quantity):
+                ingredients[ingredient+"_"+str(index)] = self._fetch_item(ingredient, ilevel, identified, frame_type)
+        return ingredients          
+
+    def display_stash_locations(self, count:int=2):
+        ingredients = self._collect_ingredients()
+        assert isinstance(ingredients, dict)  # just to make sure we got the right things
+
+        if not self.is_recipe_complete(ingredients):
+            print("Recipe missing ingredient")
+            return False
+    
+        for ingredient, item in ingredients.items():
+            print(ingredient,item.x,item.y,type(item))
+
+    def is_recipe_complete(self, recipe_set:dict):
+        if None in recipe_set.values():
+            return False
+        return True
+
+    def simplify_items(self,raw_item_list_json:list)->list[PoEItemWrapper]:
+        processed_list = []
+        for item in raw_item_list_json:
+            processed_list.append(PoEItemWrapper(item))
+        return processed_list
+    
+    def click_items_in_stash(self, sleep_sec:float=0.2):
+        def click_grid(self:RecipeHandler,grid_coords:list[int,int]):
+            coords = self.quad_1440.center_in_tile(self.quad_1440.grid2pixel_coords(grid_coords))
+            print("moving:",grid_coords,coords)
+            pyautogui.moveTo(coords[0], coords[1])
+            time.sleep(sleep_sec/2)
+            pyautogui.click()
+            time.sleep(sleep_sec)
+
+        ingredients = self._collect_ingredients()
+
+        if not self.is_recipe_complete(ingredients):
+            print("Recipe missing ingredient")
+            return False
+        
+        # start sequence
+        pyautogui.keyDown('ctrl')  
+        time.sleep(sleep_sec)    
+        for ingredient, item in ingredients.items():
+            print(ingredient)
+            click_grid(self, [item.x,item.y])
+  
+        pyautogui.keyUp('ctrl')        
+    
+class StashGrid():
+    quad_grid = [[[r+1,c+1] for r in range(24)] for c in range(24)]
+
+    def __init__(self,pixel_coords:list[int,int,int,int], grid_type:int=2) -> None:
+        if grid_type == 2:
+            self.grid_size = len(self.quad_grid[0])
+            print(self.grid_size)
+        self.pixel_coords = pixel_coords
+        self.left_trim_pixel = pixel_coords[0]
+        self.top_trim_pixel = pixel_coords[1]
+        self.tile_size = (pixel_coords[2] - pixel_coords[0])/self.grid_size
+        # print(self.quad_grid)
+    
+    def grid2pixel_coords(self,grid_coords:list)-> list[int,int]:
+        x_margin = self.left_trim_pixel
+        x_distance = (grid_coords[0])*self.tile_size
+        x = x_margin+x_distance
+        y_margin = self.top_trim_pixel
+        y_distance = (grid_coords[1])*self.tile_size
+        y = y_margin+y_distance      
+        return [x,y]
+    
+    def center_in_tile(self,pixel_coords:list)-> list[int,int]:
+        x = pixel_coords[0]+self.tile_size/2
+        y = pixel_coords[1]+self.tile_size/2
+        return [x,y]
     
 def validate_league(parser:DataParser, user_input:str=None):
     active_leagues = parser.get_leagues()
@@ -615,18 +742,18 @@ def _get_pid_of_exe_path(exe_path:str):
     """Get the executable path of the process associated with the given window handle."""
     for process in psutil.process_iter(['pid', 'exe']):
         if process.info['exe'] == exe_path:
-            print(process.info['pid'])
+            # print(process.info['pid'])
             return process.info['pid']
 
-def poe_chat(msg:str,target_pid:int,auto_send:bool=True):    
-    
+def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):    
+    pid = _get_pid_of_exe_path(poe_exe_path)
     # check for "PathOfExile.exe"
-    poe = pywinauto.Application().connect(process=target_pid)
-    print(poe)
+    poe = pywinauto.Application().connect(process=pid)
+    # print(poe)
     poe.PathOfExile.type_keys("{ENTER}"+msg+"{ENTER}", with_spaces=True, pause=0.00)
 
 
 if __name__ == "__main__":
-
-    pid = _get_pid_of_exe_path(r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
-    poe_chat("/itemfilter dl",pid)
+    pass
+    # pid = _get_pid_of_exe_path(r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
+    # poe_chat("/itemfilter dl",pid)

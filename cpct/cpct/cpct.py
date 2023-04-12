@@ -6,7 +6,7 @@ import time
 import webbrowser
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication, QColorDialog, QInputDialog, QWidget
 from PyQt5 import QtGui
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 import qt.main_gui
 import ctypes
 import poepy
@@ -23,6 +23,7 @@ from __about__ import __version__
 if typing.TYPE_CHECKING:
     api:poepy.PoeApiHandler
     parser:poepy.DataParser
+    gui:qt.main_gui.MainWindow
 
 # set statics
 IMG_FOLDER = os.path.realpath(__file__)[:-7]+"img\\"
@@ -42,7 +43,11 @@ QProgressBar::chunk {
 modified = 0
 async_time = time.time()
 previous = 0
+zone_log = []
+filter_updated = False
+slot_count = None
 refresh_off_cooldown = True
+recipe_handler = None
 
 class AsyncMainWindow(QMainWindow):
     log_timer = QTimer()
@@ -160,6 +165,7 @@ def apply_ui_connections(gui_obj, parser):
     gui_obj.actionAwakened_PoE_Trade.triggered.connect(lambda: webbrowser.open("https://github.com/SnosMe/awakened-poe-trade") )
     gui_obj.actionPatreon.triggered.connect(lambda: webbrowser.open("https://www.patreon.com/chipysPoEChaosTool") )
     gui_obj.actionInput_ClientSecret.triggered.connect(lambda: request_client_secret() )
+    gui_obj.actiondev_button.triggered.connect(lambda: dev_button(gui_obj, parser) )
     
     #ClientSecrect Menu
     # gui_obj.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_obj) )
@@ -171,9 +177,10 @@ def apply_ui_connections(gui_obj, parser):
     gui_obj.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_obj))
 
     # Link ComboBoxes
-    gui_obj.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_obj))
-    gui_obj.select_tab.currentIndexChanged.connect(lambda: action_set_tab(gui_obj))
-    gui_obj.filter_mode.currentIndexChanged.connect(lambda: update_item_filter(gui_obj, parser))
+    gui_obj.select_league.activated.connect(lambda: action_set_league(gui_obj, parser))
+    # gui_obj.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_obj))
+    gui_obj.select_tab.activated.connect(lambda: action_set_tab(gui_obj))
+    gui_obj.filter_mode.activated.connect(lambda: update_item_filter(gui_obj, parser))
     gui_obj.sets_target.valueChanged.connect(lambda: change_target_count(gui_obj))
 
     # Link Text
@@ -216,36 +223,33 @@ def action_load_leagues(gui):
     gui.select_tab.clear()
     gui.select_league.addItems(leagues)
 
-    # set previous league
-    gui_main.select_league.setCurrentText(user_info.get("form","league"))
+    # load previous league
+    gui.select_league.setCurrentText(user_info.get("form","league"))
     
 @timed_try_wrapper
-def action_set_league(gui):
+def action_set_league(gui, parser):
     # load current selection for league
     league = gui.select_league.currentText()
-    # print("League:",league)
-    if league != "":
-        try:
-            previous = user_info.get("form", "league")
-            # print("previous:",previous)
-            action_load_tabs(gui, previous)
-        except Exception as e:
-            print("action_set_league::>",e)
-            user_info.set("form", "league",gui.select_league.currentText()) 
-            action_load_tabs(gui, league)
+
+    # try pull the league
+    action_load_tabs(gui, league, parser)
+
+    # now save changes 
+    user_info.set("form", "league",gui.select_league.currentText()) 
 
 @timed_try_wrapper
-def action_load_tabs(gui, league):
-    global parser, gui_main
+def action_load_tabs(gui, league, parser):
     tabs = parser.get_tab_names(league).keys()
 
     # clear the box and repop
     gui.select_tab.clear()
     gui.select_tab.addItems(tabs)
-    
+
+    # select previous tab
+    gui.select_tab.setCurrentText(user_info.get("form","tab"))    
+
 @timed_try_wrapper
 def action_set_tab(gui, force_recache:bool=False):
-    global parser, gui_main
     user_info.set("form", "tab", gui.select_tab.currentText())
   
 def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->dict:
@@ -259,14 +263,12 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         dict: returns list of count %s (0-100)
     """
     # TODO REMOVE GLOBAL REFERENCE 
-    global refresh_off_cooldown
+    global refresh_off_cooldown, recipe_handler
     league_of_interest = gui.select_league.currentText()
 
     # put the manual refresh button on cooldown
     refresh_off_cooldown = False
     gui_main.refresh_link.setEnabled(refresh_off_cooldown)
-
-    # TODO Auto filter reload "/itemfilter 0PKKgH0"
 
     try:
         # tab_of_interes
@@ -289,6 +291,10 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
         # print("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
         
+        # load recipes
+        recipe_handler = poepy.RecipeHandler(items_of_interest)
+        #TODO replace slot_counter with RecipeHandler
+
         # loop and count unids
         count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
         # gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
@@ -341,7 +347,7 @@ def async_two():
 def log_search():
     """Checks the ClientLog for a maching zone change with timestamp in the current minute
     """
-    global modified, previous, gui_main, parser
+    global modified, previous, gui_main, parser, zone_log, filter_updated
     # 2023/03/30 09:11     
     # 2023/03/30 09:26:41 1117798968 cffb0734 [INFO Client 31504] : You have entered Aspirants' Plaza.     
     snippet = " : You have entered"
@@ -355,10 +361,13 @@ def log_search():
         # gui_main.count_report_string.setText("Reading...")
         stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         # TODO rebuild this to always look only at X recent lines for speed
+
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
-                if stamp in line and snippet in line:
+                if stamp in line and snippet in line and line not in zone_log:
                         print(line)
+                        filter_updated = False
+                        zone_log.append(line)
                         gui_main.count_report_string.setText(line[78:])
                         update_item_filter(gui_main, parser, force_recache=True)
                         return
@@ -417,7 +426,7 @@ def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
 
 @timed_try_wrapper
 def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:bool=True, always_show_amulets:bool=True):
-    global gui_main
+    global gui_main, filter_updated, slot_count
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
     path = user_info.cfg.get("form","filter_name")
@@ -425,10 +434,22 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     target = 100  # 100% of the goal
     slot_count_percent = count_unid_rares(gui, parser, force_recache)
 
-    #TODO build try wrapper to accept asserts
+    if mode == "Disabled":
+        return
+
     # assert isinstance(slot_count_percent, dict)  # If this isn't a dict something didn't pull right from tabs
     if not isinstance(slot_count_percent, dict):
         return False
+
+    # check if filter needs changing
+    for key, value in slot_count_percent.items():
+        # skip totals
+        if key == "Total":
+            continue
+        if value > 99 and isinstance(slot_count,dict) and slot_count[key] < 100:
+            filter_updated = True
+            break
+    slot_count = slot_count_percent
 
     # exit case if we don't have a parser object yet
     if not parser or not isinstance(parser, poepy.DataParser):
@@ -484,8 +505,9 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     print(txt)
     gui_main.count_report_string.setText(txt)
 
-    pid = poepy._get_pid_of_exe_path(r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
-    poepy.poe_chat("/itemfilter dl" ,pid)
+    if filter_updated:
+        # TODO build GUI element for this path and store it
+        poepy.poe_chat("/itemfilter dl", r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
             
 @timed_try_wrapper
 def request_client_secret():
@@ -502,6 +524,10 @@ def request_client_secret():
 @timed_try_wrapper
 def change_target_count(gui):
     user_info.set("form","sets_goal", str(gui.sets_target.value()))
+
+def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
+    global recipe_handler    
+    recipe_handler.click_items_in_stash()
 
 if __name__ == "__main__":
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon
@@ -523,6 +549,10 @@ if __name__ == "__main__":
     MainWindow.show()
     gui_main = qt.main_gui.Ui_MainWindow()
     gui_main.setupUi(MainWindow)
+
+    # MainWindow.setWindowFlags(MainWindow.windowFlags() | Qt.WindowStaysOnTopHint)
+    # MainWindow.setAttribute(Qt.WA_TranslucentBackground)
+    # MainWindow.setWindowFlags(Qt.FramelessWindowHint)
 
     # Modify the gui with connections and links
     apply_ui_connections(gui_main, parser)  # here we modify actions to the GUI
