@@ -606,7 +606,8 @@ class RecipeHandler():
         assert isinstance(ingredients, dict)  # just to make sure we got the right things
 
         if not self.is_recipe_complete(ingredients):
-            print("Recipe missing ingredient")
+            print("Recipe missing ingredient!")
+            print(ingredients)
             return False
     
         for ingredient, item in ingredients.items():
