@@ -50,6 +50,9 @@ slot_count = None
 refresh_off_cooldown = True
 recipe_handler = None
 
+# configure Logging
+logging.basicConfig(filename='cpct.log', encoding='utf-8', level=logging.DEBUG)
+
 class AsyncMainWindow(QMainWindow):
     log_timer = QTimer()
     def __init__(self):
@@ -57,15 +60,22 @@ class AsyncMainWindow(QMainWindow):
         self.init_async()
 
     def init_async(self):
-        print("Initializing . . . ", end="")
+        p_l(f"Initializing aync loop every ({ASYNC_INTERVAL_MS} ms). . . ", end="")
         self.log_timer.timeout.connect(async_two)
         self.log_timer.start(ASYNC_INTERVAL_MS)
-        print("Started")
+        p_l(" done")
 
-def p_l(*args):
-    ts = timestamp()
-    print(*args)
-    logging.warn(ts+str(*args))
+def p_l(*args, end="\n"):
+    ts = timestamp() + ">>\t"
+    print(*args, end=end)
+    if "warning" in args[0]:
+        logging.warning(ts+str(*args))
+    elif "crit" in args[0]:
+        logging.critical(ts+str(*args))
+    elif "error" in args[0]:
+        logging.error(ts+str(*args))
+    else:
+        logging.debug(ts+str(*args))
 
 def timestamp():
     return time.strftime("%H:%M:%S")
@@ -93,11 +103,11 @@ def timed_try_wrapper(function):
         try:
             result = function(*args, **kwargs)
             end = time.time()
-            print(function.__name__, "=> RunTime:",end-start)
+            p_l(function.__name__, "=> RunTime:",end-start)
             return result
         except Exception as e:
             end = time.time()
-            print(timestamp(), function.__name__, "=> FAILED:",end-start, e)
+            p_l(timestamp(), function.__name__, "=> FAILED:",end-start, e)
             result = False
     return wrapper    
 
@@ -111,7 +121,6 @@ def apply_ui_defaults(gui_obj, window_obj, app_obj):
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap(IMG_FOLDER+"poe.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     gui_obj.login_link.setIcon(icon)
-    print(IMG_FOLDER+"dropper.png")
     icon.addPixmap(QtGui.QPixmap(IMG_FOLDER+"dropper.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     gui_obj.color_link_rings.setIcon(icon)
     gui_obj.color_link_amulets.setIcon(icon)
@@ -279,23 +288,23 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
     try:
         # tab_of_interes
         tab_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
-        print("tab_of_interest>",type(tab_of_interest))
+        p_l("tab_of_interest>",type(tab_of_interest))
 
         # list of items
         items_of_interest = parser.get_items(tab_of_interest, league_of_interest, force_recache)
-        # print("items_of_interest>",type(items_of_interest))
+        # p_l("items_of_interest>",type(items_of_interest))
 
         # filter for unid
         items_unidentified = parser.filter_identified(items_of_interest)
-        # print("items_unidentified>",items_unidentified)
+        # p_l("items_unidentified>",items_unidentified)
 
         # filter for ilevel
         items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
-        # print("items_unidentified_ilvl>",items_unidentified_ilvl)
+        # p_l("items_unidentified_ilvl>",items_unidentified_ilvl)
 
         # filter for rares
         items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
-        # print("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
+        # p_l("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
         
         # load recipes
         recipe_handler = poepy.RecipeHandler(items_of_interest)
@@ -332,7 +341,7 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         # report
         return count
     except Exception as e:
-        print(timestamp(),"count_unid_rares() Error:"+str(e))
+        p_l(timestamp(),"count_unid_rares() Error:"+str(e))
         return False
 
 def async_two():
@@ -361,13 +370,13 @@ def log_search():
     modified = os.path.getmtime(path)
     if modified > previous:
         previous = modified
-        # print("Last modified: %s" % time.ctime(modified))
+        # p_l("Last modified: %s" % time.ctime(modified))
         stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
 
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
                 if stamp in line and snippet in line and line not in zone_log:
-                        print(line)
+                        p_l(line)
                         filter_updated = False
                         zone_log.append(line)
                         gui_main.count_report_string.setText(line[78:])
@@ -404,14 +413,14 @@ def receive_client_secret(gui):
 @timed_try_wrapper
 def pick_color(gui, target_object, save_name):
     rgba = user_info.get("form", save_name)
-    print(type(rgba),rgba)
+    p_l(type(rgba),rgba)
     current_color = QtGui.QColor(int(rgba[0]),int(rgba[1]),int(rgba[2]),int(rgba[3]))
     new_color = QColorDialog.getColor(current_color, title=f"Pick a new color for {save_name}")
     if new_color.isValid():
         new_rgba = list(new_color.getRgb())
         user_info.set("form", save_name, str(new_rgba))
         target_object.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE,new_rgba))
-        print(type(new_rgba),new_rgba)
+        p_l(type(new_rgba),new_rgba)
 
 def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
     def rgba_t0_hex(rgba:list) -> str:
@@ -459,7 +468,7 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
 
     # exit case for when counts could not be found
     if not slot_count_percent:
-        print(f"Failed to recieve item counts [slot_count = {slot_count_percent}]")
+        p_l(f"Failed to recieve item counts [slot_count = {slot_count_percent}]")
         return False
 
     # read data without mod section
@@ -477,7 +486,7 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     # rebuild filter text adding back in slots as needed   
     prefix = header
     if "Disabled" not in mode:
-        print(slot_count_percent)
+        p_l(slot_count_percent)
         if slot_count_percent["Weapon"] < target:
             prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapon_rgba"),width="= 1").to_str()
         if slot_count_percent["Helmet"] < target:
@@ -504,7 +513,7 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     t = timestamp()
     n =  os.path.split(path)[1]
     txt = f"{t} '{n}' updated!"
-    print(txt)
+    p_l(txt)
     gui_main.count_report_string.setText(txt)
 
     if filter_updated:
@@ -518,7 +527,7 @@ def request_client_secret():
     discord_name, ok = QInputDialog.getText(promt_obj, 'Send Discord Request?', 'Please provide the Discord name (including full "name#1234") to send the secret to')
     if ok:
         post = poepy.request_secret(discord_name)
-        print(post)
+        p_l(post)
         if "20" in str(post):
             gui_main.count_report_string.setText('Request has been send please look out for a friend request on Discord')
             # QInputDialog.getText(promt_obj, 'Request Sent', 'Request has been send please look out for a friend request on Discord')
@@ -538,27 +547,42 @@ if __name__ == "__main__":
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # load user file
+    p_l("Loading user info . . .", end="")
     user_info.load()
+    p_l(". . . done")
 
-    # build the api/parser object
+    p_l("Building API Object . . .", end="")
     api = poepy.PoeApiHandler()
+    p_l(" done")
+    p_l("Building DataParser . . .", end="")
     parser = poepy.DataParser(api_handler = api)
+    p_l(" done")
 
-    # build main GUI
+    p_l("Setting App Object . . .", end="")   
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
+    p_l(" done")   
+    p_l("Building Main Window . . .")   
     MainWindow = AsyncMainWindow()
     MainWindow.show()
+    p_l("Building Main GUI . . .", end="")   
     gui_main = qt.main_gui.Ui_MainWindow()
     gui_main.setupUi(MainWindow)
+    p_l(" done")   
+
 
     # MainWindow.setWindowFlags(MainWindow.windowFlags() | Qt.WindowStaysOnTopHint)
     # MainWindow.setAttribute(Qt.WA_TranslucentBackground)
     # MainWindow.setWindowFlags(Qt.FramelessWindowHint)
+    
+    
+    p_l("Setting GUI Defaults . . .", end="")
+    apply_ui_defaults(gui_main, MainWindow, app) 
+    p_l(" done")
 
-    # Modify the gui with connections and links
-    apply_ui_connections(gui_main, parser)  # here we modify actions to the GUI
-    apply_ui_defaults(gui_main, MainWindow, app)  # set default values for the form when it's made
+    p_l("Building GUI Connections . . .", end="")
+    apply_ui_connections(gui_main, parser)
+    p_l(" done")
 
     # run app as the last thing in the script
     sys.exit(app.exec_())
