@@ -12,6 +12,7 @@ import ctypes
 import poepy
 import user_info
 from __about__ import __version__
+import logging
 
 # PoE dev Docs for ref
 # https://www.pathofexile.com/developer/docs
@@ -61,6 +62,11 @@ class AsyncMainWindow(QMainWindow):
         self.log_timer.start(ASYNC_INTERVAL_MS)
         print("Started")
 
+def p_l(*args):
+    ts = timestamp()
+    print(*args)
+    logging.warn(ts+str(*args))
+
 def timestamp():
     return time.strftime("%H:%M:%S")
 
@@ -73,7 +79,7 @@ def try_wrapper(function):
         try:
             return function(*args, **kwargs)
         except Exception as e:
-            print(timestamp(), function.__name__, "=> FAILED:", e)
+            p_l(timestamp(), function.__name__, "=> FAILED:", e)
             return False
     return wrapper  
 
@@ -268,7 +274,7 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
 
     # put the manual refresh button on cooldown
     refresh_off_cooldown = False
-    gui_main.refresh_link.setEnabled(refresh_off_cooldown)
+    gui.refresh_link.setEnabled(refresh_off_cooldown)
 
     try:
         # tab_of_interes
@@ -293,11 +299,10 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         
         # load recipes
         recipe_handler = poepy.RecipeHandler(items_of_interest)
-        #TODO replace slot_counter with RecipeHandler
 
         # loop and count unids
-        count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
-        # gui_main.count_report_string.setText(f"Count Total: {count['Total']}")
+        # count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
+        count = recipe_handler.slot_count
 
         # Set scales and mutlipliers
         target = gui.sets_target.value()
@@ -314,22 +319,21 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         count["Belt"] = round(min(100,count["Belt"]*multiplier))
         count["Amulet"] = round(min(100,count["Amulet"]*multiplier))
         
-
         # set GUI element values
-        gui_main.count_weapons.setValue(count["Weapon"])
-        gui_main.count_helmets.setValue(count["Helmet"])
-        gui_main.count_bodies.setValue(count["Body Armour"])
-        gui_main.count_boots.setValue(count["Boots"])
-        gui_main.count_gloves.setValue(count["Gloves"])
-        gui_main.count_belts.setValue(count["Belt"])
-        gui_main.count_amulets.setValue(count["Amulet"])
-        gui_main.count_rings.setValue(count["Ring"])
+        gui.count_weapons.setValue(count["Weapon"])
+        gui.count_helmets.setValue(count["Helmet"])
+        gui.count_bodies.setValue(count["Body Armour"])
+        gui.count_boots.setValue(count["Boots"])
+        gui.count_gloves.setValue(count["Gloves"])
+        gui.count_belts.setValue(count["Belt"])
+        gui.count_amulets.setValue(count["Amulet"])
+        gui.count_rings.setValue(count["Ring"])
         
         # report
         return count
     except Exception as e:
         print(timestamp(),"count_unid_rares() Error:"+str(e))
-        return [False, False]
+        return False
 
 def async_two():
     global refresh_off_cooldown, gui_main, async_time
@@ -358,9 +362,7 @@ def log_search():
     if modified > previous:
         previous = modified
         # print("Last modified: %s" % time.ctime(modified))
-        # gui_main.count_report_string.setText("Reading...")
         stamp = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
-        # TODO rebuild this to always look only at X recent lines for speed
 
         with open(path, "r", encoding="utf-8") as file:
             for line in file:

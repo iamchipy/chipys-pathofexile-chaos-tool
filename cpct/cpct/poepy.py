@@ -46,6 +46,9 @@ FRAMETYPE_PROPHECY = 8
 FRAMETYPE_FOIL = 9
 FRAMETYPE_SUPPORTERFOIL = 10
 
+RECIPE_CHAOS = 60
+RECIPE_REGAL = 75
+
 """
 PROCESS
 - Connection handler
@@ -581,24 +584,39 @@ class RecipeHandler():
 
     def _fetch_item(self, 
                     slot:str, 
-                    ilevel:int=60, 
+                    ilvl_range:int=60, 
                     identified:bool=False, 
-                    frame_type:int=FRAMETYPE_RARE):
+                    frame_type:int=FRAMETYPE_RARE) -> PoEItemWrapper:
         for item in self.list_of_items:
             # check if hash has been assigned
             if item.hash in self.assigned_hashes:
                 continue
             # check if item matches desired details
-            if item.slot == slot and item.ilvl >= ilevel and item.identified == identified and item.rarity == frame_type:
+            if item.slot == slot and ilvl_range[0]<= item.ilvl <= ilvl_range[1] and item.identified == identified and item.rarity == frame_type:
                 self.assigned_hashes.append(item.hash)
                 return item
         return None
 
-    def _collect_ingredients(self, ilevel:int=60, identified:bool=False, frame_type:int=FRAMETYPE_RARE):
+    def _collect_ingredients(self, recipe_mode:int=RECIPE_CHAOS, identified:bool=False, frame_type:int=FRAMETYPE_RARE) -> list[PoEItemWrapper]:
+        
+        # Set iLvl requirements (assuming the case to be Chaos we only check for regal)
+        requires_one_below_75 = True
+        if recipe_mode > 74:
+            requires_one_below_75 = False
+
         ingredients = {}
         for ingredient, quantity in self.RECIPE.items():
             for index in range(quantity):
-                ingredients[ingredient+"_"+str(index)] = self._fetch_item(ingredient, ilevel, identified, frame_type)
+                # ask for ingredient below 75 if need, until met
+                if requires_one_below_75:
+                    item = self._fetch_item(ingredient, [60,74], identified, frame_type)
+                    if item:
+                        requires_one_below_75 = False
+                    else:
+                        item = self._fetch_item(ingredient, [60,100], identified, frame_type)
+                else:
+                    item = self._fetch_item(ingredient, [60,100], identified, frame_type)
+                ingredients[ingredient+"_"+str(index)] = item
         return ingredients          
 
     def display_stash_locations(self, count:int=2):
@@ -613,7 +631,7 @@ class RecipeHandler():
         for ingredient, item in ingredients.items():
             print(ingredient,item.x,item.y,type(item))
 
-    def is_recipe_complete(self, recipe_set:dict):
+    def is_recipe_complete(self, recipe_set:dict) -> bool:
         if None in recipe_set.values():
             return False
         return True
@@ -624,17 +642,17 @@ class RecipeHandler():
             processed_list.append(PoEItemWrapper(item))
         return processed_list
     
+    def _click_inv_grid(self,grid_coords:list[int,int], sleep_sec):
+        coords = self.quad_1440.center_in_tile(self.quad_1440.grid2pixel_coords(grid_coords))
+        print("moving:",grid_coords,coords)
+        pyautogui.moveTo(coords[0], coords[1])
+        time.sleep(sleep_sec/2)
+        pyautogui.click()
+        time.sleep(sleep_sec)
+
     def click_items_in_stash(self, sleep_sec:float=0.2):
-        def click_grid(self:RecipeHandler,grid_coords:list[int,int]):
-            coords = self.quad_1440.center_in_tile(self.quad_1440.grid2pixel_coords(grid_coords))
-            print("moving:",grid_coords,coords)
-            pyautogui.moveTo(coords[0], coords[1])
-            time.sleep(sleep_sec/2)
-            pyautogui.click()
-            time.sleep(sleep_sec)
 
         ingredients = self._collect_ingredients()
-
         if not self.is_recipe_complete(ingredients):
             print("Recipe missing ingredient")
             return False
@@ -644,7 +662,7 @@ class RecipeHandler():
         time.sleep(sleep_sec)    
         for ingredient, item in ingredients.items():
             print(ingredient)
-            click_grid(self, [item.x,item.y])
+            self._click_inv_grid([item.x,item.y],sleep_sec)
   
         pyautogui.keyUp('ctrl')        
     
