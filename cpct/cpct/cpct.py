@@ -299,6 +299,7 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         
         # load recipes
         recipe_handler = poepy.RecipeHandler(items_of_interest)
+        #TODO replace slot_counter with RecipeHandler
 
         # loop and count unids
         # count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
@@ -508,8 +509,9 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     gui_main.count_report_string.setText(txt)
 
     if filter_updated:
-        # TODO build GUI element for this path and store it
-        poepy.poe_chat("/itemfilter dl", r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
+        filter_name = str(os.path.split(user_info.get("form", "filter_name"))[1]).split(".")[0]
+        path = user_info.get("form","client_path")
+        poepy.poe_chat(f"/itemfilter {filter_name}", f"{path}\PathOfExile.exe")
             
 @timed_try_wrapper
 def request_client_secret():
@@ -528,8 +530,8 @@ def change_target_count(gui):
     user_info.set("form","sets_goal", str(gui.sets_target.value()))
 
 def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
-    global recipe_handler    
-    recipe_handler.click_items_in_stash()
+    global recipe_handler
+    recipe_handler.click_items_in_stash(sleep_sec=.01)
 
 if __name__ == "__main__":
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon

@@ -446,7 +446,4 @@ if __name__ == "__main__":
     ui = Ui_stash_overlay()
     ui.setupUi(stash_overlay)
     stash_overlay.show()
-    # stash_overlay.setWindowFlags(stash_overlay.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
-    # stash_overlay.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-    # stash_overlay.setWindowFlags(QtCore.Qt.FramelessWindowHint)     
     sys.exit(app.exec_())
