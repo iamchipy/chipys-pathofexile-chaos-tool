@@ -544,9 +544,16 @@ class PoEItemWrapper():
 
     def coords(self):
         return "xy top left coords in grid"
-    
+
     def size(self):
         return "dimentions"
+    
+    # def __iter__(self):
+    #     for attribute in dir(self):
+    #         print(attribute)
+    #         if not attribute.startswith("___"):
+    #             yield attribute
+
     
 class RecipeHandler():
     RECIPE = {"Weapon":4,
@@ -576,7 +583,7 @@ class RecipeHandler():
         print("Tallying slots...")
         self._tally_slots()
         print("Init_count:",self.slot_count)
-        self.display_stash_locations()
+        # self.display_stash_locations()
 
     def _tally_slots(self):
         for item in self.list_of_items:
@@ -585,16 +592,37 @@ class RecipeHandler():
     def _fetch_item(self, 
                     slot:str, 
                     ilvl_range:int=60, 
+                    ilvl:list[int,int]=[60,99], 
                     identified:bool=False, 
                     frame_type:int=FRAMETYPE_RARE) -> PoEItemWrapper:
         for item in self.list_of_items:
             # check if hash has been assigned
             if item.hash in self.assigned_hashes:
                 continue
+
             # check if item matches desired details
             if item.slot == slot and ilvl_range[0]<= item.ilvl <= ilvl_range[1] and item.identified == identified and item.rarity == frame_type:
                 self.assigned_hashes.append(item.hash)
                 return item
+            if item.slot != slot:
+                print(f"{slot} not satisfied by {item}") 
+                continue
+            
+            if ilvl[0] > item.ilvl > ilvl[1]:
+                print(f"{ilvl} failed iLvl -> in {item}") 
+                continue                
+                
+            if item.identified != identified:
+                print(f"{identified} isn't unid -> in {item}") 
+                continue  
+
+            if item.rarity != frame_type:
+                print(f"{frame_type} wrong frame -> in {item}") 
+                continue      
+
+            # if we made it this far we know it's a good fit           
+            self.assigned_hashes.append(item.hash)
+            return item
         return None
 
     def _collect_ingredients(self, recipe_mode:int=RECIPE_CHAOS, identified:bool=False, frame_type:int=FRAMETYPE_RARE) -> list[PoEItemWrapper]:
@@ -625,7 +653,6 @@ class RecipeHandler():
 
         if not self.is_recipe_complete(ingredients):
             print("Recipe missing ingredient!")
-            print(ingredients)
             return False
     
         for ingredient, item in ingredients.items():
@@ -633,6 +660,7 @@ class RecipeHandler():
 
     def is_recipe_complete(self, recipe_set:dict) -> bool:
         if None in recipe_set.values():
+            print("Set containing 'none':", [slot for slot, item in recipe_set.items() if item is None])
             return False
         return True
 
@@ -757,14 +785,15 @@ def _list_pywinauto_window_text(filter:str=""):
         if filter in title:
             print(title)    
 
-def _get_pid_of_exe_path(exe_path:str):
-    """Get the executable path of the process associated with the given window handle."""
-    for process in psutil.process_iter(['pid', 'exe']):
-        if process.info['exe'] == exe_path:
-            # print(process.info['pid'])
-            return process.info['pid']
 
 def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):    
+    def _get_pid_of_exe_path(exe_path:str):
+        """Get the executable path of the process associated with the given window handle."""
+        for process in psutil.process_iter(['pid', 'exe']):
+            if process.info['exe'] == exe_path:
+                # print(process.info['pid'])
+                return process.info['pid']
+
     pid = _get_pid_of_exe_path(poe_exe_path)
     # check for "PathOfExile.exe"
     poe = pywinauto.Application().connect(process=pid)
