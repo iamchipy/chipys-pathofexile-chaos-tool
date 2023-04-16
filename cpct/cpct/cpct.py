@@ -277,7 +277,7 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
     Returns:
         dict: returns list of count %s (0-100)
     """
-    # TODO REMOVE GLOBAL REFERENCE 
+    # TODO-MED REMOVE GLOBAL REFERENCE 
     global refresh_off_cooldown, recipe_handler
     league_of_interest = gui.select_league.currentText()
 
@@ -294,21 +294,20 @@ def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->di
         items_of_interest = parser.get_items(tab_of_interest, league_of_interest, force_recache)
         # p_l("items_of_interest>",type(items_of_interest))
 
-        # filter for unid
-        items_unidentified = parser.filter_identified(items_of_interest)
-        # p_l("items_unidentified>",items_unidentified)
+        # # filter for unid
+        # items_unidentified = parser.filter_identified(items_of_interest)
+        # # p_l("items_unidentified>",items_unidentified)
 
-        # filter for ilevel
-        items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
-        # p_l("items_unidentified_ilvl>",items_unidentified_ilvl)
+        # # filter for ilevel
+        # items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
+        # # p_l("items_unidentified_ilvl>",items_unidentified_ilvl)
 
-        # filter for rares
-        items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
-        # p_l("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
+        # # filter for rares
+        # items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
+        # # p_l("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
         
         # load recipes
         recipe_handler = poepy.RecipeHandler(items_of_interest)
-        #TODO replace slot_counter with RecipeHandler
 
         # loop and count unids
         # count = poepy.count_slots(parser, items_unidentified_ilvl_rare)
@@ -438,7 +437,7 @@ def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
 
 @timed_try_wrapper
 def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:bool=True, always_show_amulets:bool=True):
-    # TODO check here that the filter is cleared once it's completed
+    # TODO-MED check here that the filter is cleared once it's completed
     global gui_main, filter_updated, slot_count
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END

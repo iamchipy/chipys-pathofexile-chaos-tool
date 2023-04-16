@@ -405,7 +405,7 @@ class DataParser():
         return [i for i in list_of_items if i["ilvl"] >= 60]
     
     def filter_rarity(self, list_of_items:list, rarity:str="rare") -> list:
-        # TODO build the rest of the frametypes
+        # TODO-LOW build the rest of the frametypes
         # print([i["frameType"] for i in list_of_items ])
         if rarity == "rare":
             return [i for i in list_of_items if i["frameType"] == FRAMETYPE_RARE]
@@ -577,7 +577,9 @@ class RecipeHandler():
                           "Amulet":0,
                           "Ring":0,
                           "Unknown":0}
-        self.quad_1440 = StashGrid([18,175,866,1023])  # TODO fix static values
+        self.quad_1440 = StashGrid([18,175,866,1023])  
+        #TODO-HIGH build ui input option for screen size
+        #TODO-LOW build auto-dection options
         print("Done")
         self.list_of_items = self.simplify_items(list_of_items)
         print("Tallying slots...")
