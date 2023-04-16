@@ -72,8 +72,8 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 **Automated itemfilter updating** 
 
 - Works with existing items filters to modify/overlay recipe highlights
-- Only affects item backgrouns so your existing border and text colors will be unaffected
-- It can also update those when you enter a new zone to high items types that you have enough of
+- Only affects item backgrounds so your existing border and text colors will be unaffected
+- Auto updates filter once you enter a new zone (hiding item slots you have enough of)
 
 **Itemfilter color selection** 
 
@@ -109,6 +109,9 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 
 **Stability and Internals**
 
+[ ] PoE Api Rate limiter and logging
+[ ] Change OAuth to client auth type
+[ ] Secure method of fetching Secret ( likely subscription )
 [*] Rebuild item reading system into ENUM to easy class changes
 [*] Fix auto refresh not renewing the list in the GUI display
 [*] Add auto check limiter to read and log last checked zone entry
