@@ -46,7 +46,7 @@ async_time = time.time()
 previous = 0
 zone_log = []
 filter_updated = False
-slot_count = None
+currently_shown_slot = {}
 refresh_off_cooldown = True
 recipe_handler = None
 
@@ -438,7 +438,7 @@ def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
 @timed_try_wrapper
 def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:bool=True, always_show_amulets:bool=True):
     # TODO-MED check here that the filter is cleared once it's completed
-    global gui_main, filter_updated, slot_count
+    global gui_main, filter_updated, currently_shown_slot
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
     path = user_info.cfg.get("form","filter_name")
@@ -458,11 +458,18 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
         # skip totals
         if key == "Total":
             continue
-        if value > 99 and isinstance(slot_count,dict) and slot_count[key] < 100:
-            filter_updated = True
-            break
-    slot_count = slot_count_percent
-
+        # check if values have changed over threshold either ways
+        if value >= target:
+            # if current mask is showing the slot we need to change it
+            if currently_shown_slot[key]:
+                filter_updated = True
+                currently_shown_slot[key] = False
+        elif value < target:
+            # if current mask is showing the slot we need to change it
+            if not currently_shown_slot[key]:
+                filter_updated = True
+                currently_shown_slot[key] = True
+        
     # exit case if we don't have a parser object yet
     if not parser or not isinstance(parser, poepy.DataParser):
         return False
@@ -487,22 +494,22 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     # rebuild filter text adding back in slots as needed   
     prefix = header
     if "Disabled" not in mode:
-        p_l(slot_count_percent)
-        if slot_count_percent["Weapon"] < target:
+        p_l("LOG: Updating filter:", slot_count_percent)
+        if currently_shown_slot["Weapon"]:
             prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapon_rgba"),width="= 1").to_str()
-        if slot_count_percent["Helmet"] < target:
+        if currently_shown_slot["Helmet"]:
             prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmet_rgba")).to_str()
-        if slot_count_percent["Body Armour"] < target:
+        if currently_shown_slot["Body Armour"]:
             prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_body_armour_rgba")).to_str()   
-        if slot_count_percent["Boots"] < target:
+        if currently_shown_slot["Boots"]:
             prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgba")).to_str()
-        if slot_count_percent["Gloves"] < target:
+        if currently_shown_slot["Gloves"]:
             prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgba")).to_str()
-        if slot_count_percent["Belt"] < target:
+        if currently_shown_slot["Belt"]:
             prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgba")).to_str()          
-        if always_show_amulets or slot_count_percent["Amulet"] < target:
+        if gui_main.always_show_jewelry.checkState() or currently_shown_slot["Amulet"]:
             prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgba")).to_str()          
-        if always_show_rings or slot_count_percent["Ring"] < target:
+        if gui_main.always_show_jewelry.checkState() or currently_shown_slot["Ring"]:
             prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgba")).to_str()
     prefix += footer
 
@@ -515,7 +522,7 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     n =  os.path.split(path)[1]
     txt = f"{t} '{n}' updated!"
     p_l(txt)
-    gui_main.count_report_string.setText(txt)
+    gui.count_report_string.setText(txt)
 
     if filter_updated:
         filter_name = str(os.path.split(user_info.get("form", "filter_name"))[1]).split(".")[0]
