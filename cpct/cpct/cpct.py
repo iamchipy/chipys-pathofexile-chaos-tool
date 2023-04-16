@@ -111,7 +111,7 @@ def timed_try_wrapper(function):
             result = False
     return wrapper    
 
-def apply_ui_defaults(gui_obj:qt.main_gui.MainWindow, window_obj, app_obj):
+def apply_ui_defaults(gui_obj:qt.main_gui.Ui_MainWindow, window_obj, app_obj):
 
     # set window Icons
     app_obj.setWindowIcon(QtGui.QIcon(IMG_FOLDER+'cpct_logo.png'))
@@ -267,7 +267,7 @@ def action_load_tabs(gui, league, parser):
 def action_set_tab(gui, force_recache:bool=False):
     user_info.set("form", "tab", gui.select_tab.currentText())
   
-def count_unid_rares(gui, parser, force_recache:bool=False, min_ilvl:int=60)->dict:
+def count_unid_rares(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser, force_recache:bool=False, min_ilvl:int=60)->dict:
     """Function to count unidentified rare items of ilevel
 
     Args:
