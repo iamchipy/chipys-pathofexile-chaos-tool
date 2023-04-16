@@ -24,7 +24,7 @@ import logging
 if typing.TYPE_CHECKING:
     api:poepy.PoeApiHandler
     parser:poepy.DataParser
-    gui:qt.main_gui.MainWindow
+    gui:qt.main_gui.Ui_MainWindow
 
 # set statics
 IMG_FOLDER = os.path.realpath(__file__)[:-7]+"img\\"
@@ -111,7 +111,7 @@ def timed_try_wrapper(function):
             result = False
     return wrapper    
 
-def apply_ui_defaults(gui_obj, window_obj, app_obj):
+def apply_ui_defaults(gui_obj:qt.main_gui.MainWindow, window_obj, app_obj):
 
     # set window Icons
     app_obj.setWindowIcon(QtGui.QIcon(IMG_FOLDER+'cpct_logo.png'))
@@ -150,7 +150,7 @@ def apply_ui_defaults(gui_obj, window_obj, app_obj):
     # defaults for item_filter modes
     gui_obj.filter_mode.addItems(["Default","FilterBlade","Custom","Disabled"])
     
-def apply_ui_connections(gui_obj, parser):
+def apply_ui_connections(gui_obj:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
     """Overlay that connects up the GUI so that we can modularly replace the gui.py from QT5
     https://www.geeksforgeeks.org/function-wrappers-in-python/
     Args:
@@ -542,7 +542,7 @@ def request_client_secret():
             # QInputDialog.getText(promt_obj, 'Request Sent', 'Request has been send please look out for a friend request on Discord')
 
 @timed_try_wrapper
-def change_target_count(gui):
+def change_target_count(gui:qt.main_gui.Ui_MainWindow):
     user_info.set("form","sets_goal", str(gui.sets_target.value()))
 
 def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
