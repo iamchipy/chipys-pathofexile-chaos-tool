@@ -75,7 +75,7 @@ def p_l(*args, end="\n"):
     elif "error" in args[0]:
         logging.error(ts+str(*args))
     else:
-        logging.debug(ts+str(*args))
+        logging.debug(ts+str(args))
 
 def timestamp():
     return time.strftime("%H:%M:%S")

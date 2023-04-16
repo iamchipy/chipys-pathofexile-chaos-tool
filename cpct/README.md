@@ -115,6 +115,7 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 [*] Rebuild item reading system into ENUM to easy class changes
 [*] Fix auto refresh not renewing the list in the GUI display
 [*] Add auto check limiter to read and log last checked zone entry
+[ ] Add internal handling for missing filepath of filters and browse folder requests
  
 
 ## License

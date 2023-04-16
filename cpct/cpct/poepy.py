@@ -593,25 +593,27 @@ class RecipeHandler():
 
     def _fetch_item(self, 
                     slot:str, 
-                    ilvl_range:int=60, 
-                    ilvl:list[int,int]=[60,99], 
+                    ilvl_range:list[int,int]=[60,99], 
                     identified:bool=False, 
                     frame_type:int=FRAMETYPE_RARE) -> PoEItemWrapper:
+        assert isinstance(ilvl_range, list)
+
         for item in self.list_of_items:
             # check if hash has been assigned
             if item.hash in self.assigned_hashes:
                 continue
 
             # check if item matches desired details
-            if item.slot == slot and ilvl_range[0]<= item.ilvl <= ilvl_range[1] and item.identified == identified and item.rarity == frame_type:
-                self.assigned_hashes.append(item.hash)
-                return item
+            # if item.slot == slot and ilvl_range[0]<= item.ilvl <= ilvl_range[1] and item.identified == identified and item.rarity == frame_type:
+            #     self.assigned_hashes.append(item.hash)
+            #     return item
+
             if item.slot != slot:
                 print(f"{slot} not satisfied by {item}") 
                 continue
             
-            if ilvl[0] > item.ilvl > ilvl[1]:
-                print(f"{ilvl} failed iLvl -> in {item}") 
+            if ilvl_range[0] > item.ilvl > ilvl_range[1]:
+                print(f"{ilvl_range} failed iLvl -> in {item}") 
                 continue                
                 
             if item.identified != identified:
