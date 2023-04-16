@@ -48,7 +48,7 @@ zone_log = []
 filter_updated = False
 currently_shown_slot = {}
 refresh_off_cooldown = True
-recipe_handler = None
+recipe_handler:poepy.RecipeHandler = None
 
 # configure Logging
 logging.basicConfig(filename='cpct.log', encoding='utf-8', level=logging.DEBUG)
@@ -507,9 +507,9 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
             prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgba")).to_str()
         if currently_shown_slot["Belt"]:
             prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgba")).to_str()          
-        if gui_main.always_show_jewelry.checkState() or currently_shown_slot["Amulet"]:
+        if currently_shown_slot["Amulet"] or gui_main.always_show_jewelry.checkState():
             prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgba")).to_str()          
-        if gui_main.always_show_jewelry.checkState() or currently_shown_slot["Ring"]:
+        if currently_shown_slot["Ring"] or gui_main.always_show_jewelry.checkState():
             prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgba")).to_str()
     prefix += footer
 
@@ -547,7 +547,8 @@ def change_target_count(gui):
 
 def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
     global recipe_handler
-    recipe_handler.click_items_in_stash(sleep_sec=.01)
+    action_delay_sec = gui.set_delay.value()
+    recipe_handler.click_items_in_stash(sleep_sec=action_delay_sec)
 
 if __name__ == "__main__":
     # required for Windows to recognize a Python script as it's own applications and thus have a unique Taskbar Icon
