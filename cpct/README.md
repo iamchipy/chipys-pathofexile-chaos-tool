@@ -89,21 +89,29 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 
 ## Feature Requests
 
+**Major**
+
+[ ] Write for Steam Version and path options!
 [ ] Integration with FilterBlade filters (rather than just added it's own)
 [ ] Integration with Online filters (if possible)
+[ ] Add regal recipe functionality 
+
+**Minor**
+
 [ ] Additional filter color/font/size customization options
 [ ] Add alpha slider to picker
-[ ] Rebuild item reading system into ENUM to easy class changes
 [ ] Add 2-H weapon options to filter
-[ ] Add league and tab memory
-[ ] Add never hide rings/ammy options
+[*] Add league and tab memory
+[ ] Add never hide rings/ammy GUI options
 [ ] Add sets ready counters (with ilvl checking)
-[ ] Add feature to indicate next items
-[ ] Fix auto refresh not renewing the list in the GUI display
-[ ] Add auto check limiter to read and log last checked zone entry
-[ ] Fix GUI and regal filter to be i75 (not 70)
-[ ] Write for Steam Version and path options!
+[ ] Add feature to indicate next items (set assembling guidance)
+[*] Fix GUI and regal filter to be i75 (not 70)
 
+**Stability and Internals**
+
+[*] Rebuild item reading system into ENUM to easy class changes
+[*] Fix auto refresh not renewing the list in the GUI display
+[*] Add auto check limiter to read and log last checked zone entry
  
 
 ## License
