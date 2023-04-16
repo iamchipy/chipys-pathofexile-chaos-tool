@@ -438,6 +438,7 @@ def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
 
 @timed_try_wrapper
 def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:bool=True, always_show_amulets:bool=True):
+    # TODO check here that the filter is cleared once it's completed
     global gui_main, filter_updated, slot_count
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
