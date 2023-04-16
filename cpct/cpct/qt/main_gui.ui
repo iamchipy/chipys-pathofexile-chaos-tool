@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>chipy.dev</author>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>717</width>
-    <height>357</height>
+    <width>733</width>
+    <height>396</height>
    </rect>
   </property>
   <property name="font">
@@ -145,7 +146,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>280</y>
+      <y>320</y>
       <width>701</width>
       <height>41</height>
      </rect>
@@ -1274,6 +1275,27 @@ QProgressBar::chunk {
      <double>0.040000000000000</double>
     </property>
    </widget>
+   <widget class="QCheckBox" name="always_show_jewelry">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>270</y>
+      <width>151</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTipDuration">
+     <number>2</number>
+    </property>
+    <property name="text">
+     <string>Always Show Jewelry</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
@@ -1281,7 +1303,7 @@ QProgressBar::chunk {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>717</width>
+     <width>733</width>
      <height>21</height>
     </rect>
    </property>
@@ -1399,9 +1421,7 @@ QProgressBar::chunk {
    </property>
   </action>
  </widget>
- <resources>
-  <include location="color-picker-dropper-colour-svgrepo-com.svg"/>
- </resources>
+ <resources/>
  <connections/>
  <buttongroups>
   <buttongroup name="recipe_type"/>
