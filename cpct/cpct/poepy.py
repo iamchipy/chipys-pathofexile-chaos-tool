@@ -584,15 +584,14 @@ class RecipeHandler():
                           "Belt":0,
                           "Amulet":0,
                           "Ring":0,
-                          "Unknown":0,
-                          "Shield":0}  
-        #TODO-LOW figure out a plan for non-optimal items like shield/bows etc
+                          "Unknown":0}  
         self.quad_1440 = StashGrid([18,175,866,1023])  
         #TODO-HIGH build ui input option for screen size
         #TODO-LOW build auto-dection options
 
         print("parsing > ", end="")
-        self.list_of_items = self.simplify_items(list_of_items)
+        self.list_of_items = [item for item in self.simplify_items(list_of_items) if item.rarity==2]
+        #TODO-HIGH this needs to be replaced with self._fetch_item()
 
         print("tallying items > ", end="")
         self._tally_slots()

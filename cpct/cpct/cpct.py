@@ -296,7 +296,24 @@ def count_unid_rares(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser, for
         # list of items
         items_of_interest = parser.get_items(tab_of_interest, league_of_interest, force_recache)
         # p_l("items_of_interest>",type(items_of_interest))
-        
+
+        # removed and done within PoE Item instead
+        # # filter for unid
+        # items_unidentified = parser.filter_identified(items_of_interest)
+        # # p_l("items_unidentified>",items_unidentified)
+
+        # # filter for ilevel
+        # items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
+        # # p_l("items_unidentified_ilvl>",items_unidentified_ilvl)
+
+        # # filter for rares
+        # items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
+        # # p_l("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
+
+
+
+
+
         # load recipes
         recipe_handler = poepy.RecipeHandler(items_of_interest)
 
