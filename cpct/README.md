@@ -112,7 +112,7 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 - - [ ] PoE Api Rate limiter and logging
 - - [ ] Change OAuth to client auth type
 - [ ] Secure method of fetching Secret ( likely subscription )
-- [x Rebuild item reading system into ENUM to easy class changes
+- [x] Rebuild item reading system into ENUM to easy class changes
 - [x] Fix auto refresh not renewing the list in the GUI display
 - [x] Add auto check limiter to read and log last checked zone entry
 - [ ] Add internal handling for missing filepath of filters and browse folder requests

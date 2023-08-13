@@ -6,7 +6,7 @@ import time
 import webbrowser
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QApplication, QColorDialog, QInputDialog, QWidget
 from PyQt5 import QtGui
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer
 import qt.main_gui
 import ctypes
 import poepy
@@ -467,11 +467,10 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
             if slots_visible_on_filter[key]:
                 filter_updated = True
                 slots_visible_on_filter[key] = False
-        elif value < target:
-            # value less than target count and filter currently NOT shows key we need to change it
-            if not slots_visible_on_filter[key]:
-                filter_updated = True
-                slots_visible_on_filter[key] = True
+        elif value < target and not slots_visible_on_filter[key]:
+             # value less than target count and filter currently NOT shows key we need to change it
+             filter_updated = True
+             slots_visible_on_filter[key] = True
         
     # exit case if we don't have a parser object yet
     if not parser or not isinstance(parser, poepy.DataParser):
