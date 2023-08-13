@@ -16,7 +16,7 @@ from __about__ import __version__
 import requests
 import websockets
 
-from base_types import SLOT_LOOKUP, WEAPON_LIST
+from base_types import SLOT_LOOKUP, WEAPON_LIST, SLOT_LIST
 
 HEADER_USER_AGENT ={"User-Agent": "OAuth chipytools/0.0.1 (Contact: contact@chipy.dev)"}
 HEADER_TYPE = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -47,7 +47,7 @@ FRAMETYPE_FOIL = 9
 FRAMETYPE_SUPPORTERFOIL = 10
 
 RECIPE_CHAOS = 60
-RECIPE_REGAL = 75
+RECIPE_REGAL = 75 
 
 """
 PROCESS
@@ -540,13 +540,21 @@ class PoEItemWrapper():
         self.rarity = self.raw["frameType"]
         self.identified = self.raw["identified"]
         self.ilvl = self.raw["ilvl"]
+        # print("IN>",self.raw["baseType"])
         self.slot = SLOT_LOOKUP.get(self.raw["baseType"], "Unknown")
+        # print("OUT>",self.slot)
 
     def coords(self):
         return "xy top left coords in grid"
 
     def size(self):
         return "dimentions"
+    
+    def __repr__(self) -> str:
+        simplified_info = self.__dict__
+        del simplified_info["raw"]
+        # del simplified_info["hash"]
+        return str(simplified_info)
     
     # def __iter__(self):
     #     for attribute in dir(self):
@@ -565,7 +573,7 @@ class RecipeHandler():
               "Amulet":2,
               "Ring":4}    
     def __init__(self, list_of_items:list) -> None:
-        print("Init RecipeHandler...", end="")
+        print("Init RecipeHandler > ", end="")
         self.assigned_hashes = []
         self.ready_recipes = []
         self.slot_count= {"Weapon":0,
@@ -576,20 +584,27 @@ class RecipeHandler():
                           "Belt":0,
                           "Amulet":0,
                           "Ring":0,
-                          "Unknown":0}
+                          "Unknown":0,
+                          "Shield":0}  
+        #TODO-LOW figure out a plan for non-optimal items like shield/bows etc
         self.quad_1440 = StashGrid([18,175,866,1023])  
         #TODO-HIGH build ui input option for screen size
         #TODO-LOW build auto-dection options
-        print("Done")
+
+        print("parsing > ", end="")
         self.list_of_items = self.simplify_items(list_of_items)
-        print("Tallying slots...")
+
+        print("tallying items > ", end="")
         self._tally_slots()
-        print("Init_count:",self.slot_count)
+
+        print("Count:",self.slot_count," DONE")
         # self.display_stash_locations()
 
     def _tally_slots(self):
         for item in self.list_of_items:
-            self.slot_count[item.slot] +=1
+            if item.slot in self.slot_count:    
+                self.slot_count[item.slot] +=1
+                # print("Found a", item.slot, ">>",self.slot_count[item.slot])
 
     def _fetch_item(self, 
                     slot:str, 
@@ -609,19 +624,20 @@ class RecipeHandler():
             #     return item
 
             if item.slot != slot:
-                print(f"{slot} not satisfied by {item}") 
+                # print(f"{slot} not satisfied by {item}") 
                 continue
             
-            if ilvl_range[0] > item.ilvl > ilvl_range[1]:
-                print(f"{ilvl_range} failed iLvl -> in {item}") 
+            # if 60 - 74 =>     60 > 84 > 74
+            if ilvl_range[0] > item.ilvl or item.ilvl > ilvl_range[1]:
+                # print(f"{ilvl_range} failed iLvl -> in {item}") 
                 continue                
                 
             if item.identified != identified:
-                print(f"{identified} isn't unid -> in {item}") 
+                # print(f"{identified} isn't unid -> in {item}") 
                 continue  
 
             if item.rarity != frame_type:
-                print(f"{frame_type} wrong frame -> in {item}") 
+                # print(f"{frame_type} wrong frame -> in {item}") 
                 continue      
 
             # if we made it this far we know it's a good fit           
@@ -644,6 +660,7 @@ class RecipeHandler():
                     item = self._fetch_item(ingredient, [60,74], identified, frame_type)
                     if item:
                         requires_one_below_75 = False
+                        print("SELECTED FOR FORCE iLEVEL:",item)
                     else:
                         item = self._fetch_item(ingredient, [60,100], identified, frame_type)
                 else:
@@ -704,7 +721,7 @@ class StashGrid():
     def __init__(self,pixel_coords:list[int,int,int,int], grid_type:int=2) -> None:
         if grid_type == 2:
             self.grid_size = len(self.quad_grid[0])
-            print(self.grid_size)
+            # print(self.grid_size)
         self.pixel_coords = pixel_coords
         self.left_trim_pixel = pixel_coords[0]
         self.top_trim_pixel = pixel_coords[1]

@@ -10,6 +10,7 @@ from PyQt5.QtCore import QTimer, Qt
 import qt.main_gui
 import ctypes
 import poepy
+from base_types import SLOT_NAMES
 import user_info
 from __about__ import __version__
 import logging
@@ -46,7 +47,7 @@ async_time = time.time()
 previous = 0
 zone_log = []
 filter_updated = False
-currently_shown_slot = {}
+slots_visible_on_filter = {"Unknown":0}
 refresh_off_cooldown = True
 recipe_handler:poepy.RecipeHandler = None
 
@@ -285,26 +286,16 @@ def count_unid_rares(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser, for
     refresh_off_cooldown = False
     gui.refresh_link.setEnabled(refresh_off_cooldown)
 
+    p_l("count_unid_rares()>league_of_interest>", league_of_interest)
+
     try:
-        # tab_of_interes
+        # tab_of_interest
         tab_of_interest = poepy.validate_tab(parser, league_of_interest, gui.select_tab.currentText())
-        p_l("tab_of_interest>",type(tab_of_interest))
+        p_l("count_unid_rares()>tab_of_interest>",tab_of_interest,type(tab_of_interest))
 
         # list of items
         items_of_interest = parser.get_items(tab_of_interest, league_of_interest, force_recache)
         # p_l("items_of_interest>",type(items_of_interest))
-
-        # # filter for unid
-        # items_unidentified = parser.filter_identified(items_of_interest)
-        # # p_l("items_unidentified>",items_unidentified)
-
-        # # filter for ilevel
-        # items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
-        # # p_l("items_unidentified_ilvl>",items_unidentified_ilvl)
-
-        # # filter for rares
-        # items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
-        # # p_l("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
         
         # load recipes
         recipe_handler = poepy.RecipeHandler(items_of_interest)
@@ -320,7 +311,6 @@ def count_unid_rares(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser, for
         # convert counts to %
         count["Weapon"] = round(min(100,(count["Weapon"]*multiplier)//2))
         count["Ring"] = round(min(100,(count["Ring"]*multiplier)//2))
-        
         count["Helmet"] = round(min(100,count["Helmet"]*multiplier))
         count["Body Armour"] = round(min(100,count["Body Armour"]*multiplier))
         count["Boots"] = round(min(100,count["Boots"]*multiplier))
@@ -388,6 +378,7 @@ def log_search():
 def browser_item_filters(gui):
     global MainWindow, gui_main
     #C:\Users\chipy\Documents\My Games\Path of Exile\
+    print("here")
     file_dialog = QFileDialog(MainWindow)
     file_dialog.setFileMode(QFileDialog.AnyFile)
     file_dialog.setNameFilter("Item Filter (*.filter)")
@@ -438,7 +429,7 @@ def style_sheet_new_color(base_style:str,new_rgba_color:list) -> str:
 @timed_try_wrapper
 def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:bool=True, always_show_amulets:bool=True):
     # TODO-MED check here that the filter is cleared once it's completed
-    global gui_main, filter_updated, currently_shown_slot
+    global gui_main, filter_updated, slots_visible_on_filter
     header = poepy.ITEM_FILTER_TITLE_START
     footer = poepy.ITEM_FILTER_TITLE_END
     path = user_info.cfg.get("form","filter_name")
@@ -446,29 +437,41 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     target = 100  # 100% of the goal
     slot_count_percent = count_unid_rares(gui, parser, force_recache)
 
-    if mode == "Disabled":
-        return
+    p_l(f"update_item_filter({slot_count_percent}) . . .")
 
+    # exit-case Don't waste your time here if things are disabled
+    if mode == "Disabled":
+        #TODO-HIGH reset the filter to blank if we know it's set to disabled
+        return
+    
     # assert isinstance(slot_count_percent, dict)  # If this isn't a dict something didn't pull right from tabs
     if not isinstance(slot_count_percent, dict):
         return False
 
+    # initialization case when first run we need to fill keys for variables
+    if slots_visible_on_filter.__len__()< 2:
+        for name in SLOT_NAMES:
+            slots_visible_on_filter[name] = False
+
+    p_l("Looking for changes means filter requires updating . . .")
     # check if filter needs changing
     for key, value in slot_count_percent.items():
+        p_l(f"Checking {key} . . .")
         # skip totals
-        if key == "Total":
+        if key == "Total" or key not in slots_visible_on_filter:
+            p_l(f"skipping {key}")
             continue
         # check if values have changed over threshold either ways
         if value >= target:
-            # if current mask is showing the slot we need to change it
-            if currently_shown_slot[key]:
+            # value greater than target count and filter currently shows key we need to change it
+            if slots_visible_on_filter[key]:
                 filter_updated = True
-                currently_shown_slot[key] = False
+                slots_visible_on_filter[key] = False
         elif value < target:
-            # if current mask is showing the slot we need to change it
-            if not currently_shown_slot[key]:
+            # value less than target count and filter currently NOT shows key we need to change it
+            if not slots_visible_on_filter[key]:
                 filter_updated = True
-                currently_shown_slot[key] = True
+                slots_visible_on_filter[key] = True
         
     # exit case if we don't have a parser object yet
     if not parser or not isinstance(parser, poepy.DataParser):
@@ -479,6 +482,7 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
         p_l(f"Failed to recieve item counts [slot_count = {slot_count_percent}]")
         return False
 
+    p_l("Reading itemfilter . . .")
     # read data without mod section
     current_filter = ""
     is_section_to_replace=False
@@ -491,25 +495,26 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
             if not is_section_to_replace and footer not in line:
                 current_filter += line
 
+    p_l("Building itemfilter . . .")
     # rebuild filter text adding back in slots as needed   
     prefix = header
     if "Disabled" not in mode:
         p_l("LOG: Updating filter:", slot_count_percent)
-        if currently_shown_slot["Weapon"]:
+        if slots_visible_on_filter["Weapon"]:
             prefix += poepy.ItemFilterEntry("Weapon",user_info.cfg.get("form","color_weapon_rgba"),width="= 1").to_str()
-        if currently_shown_slot["Helmet"]:
+        if slots_visible_on_filter["Helmet"]:
             prefix += poepy.ItemFilterEntry("Helmet",user_info.cfg.get("form","color_helmet_rgba")).to_str()
-        if currently_shown_slot["Body Armour"]:
+        if slots_visible_on_filter["Body Armour"]:
             prefix += poepy.ItemFilterEntry("Body Armour",user_info.cfg.get("form","color_body_armour_rgba")).to_str()   
-        if currently_shown_slot["Boots"]:
+        if slots_visible_on_filter["Boots"]:
             prefix += poepy.ItemFilterEntry("Boots",user_info.cfg.get("form","color_boots_rgba")).to_str()
-        if currently_shown_slot["Gloves"]:
+        if slots_visible_on_filter["Gloves"]:
             prefix += poepy.ItemFilterEntry("Gloves",user_info.cfg.get("form","color_gloves_rgba")).to_str()
-        if currently_shown_slot["Belt"]:
+        if slots_visible_on_filter["Belt"]:
             prefix += poepy.ItemFilterEntry("Belt",user_info.cfg.get("form","color_belt_rgba")).to_str()          
-        if currently_shown_slot["Amulet"] or gui_main.always_show_jewelry.checkState():
+        if slots_visible_on_filter["Amulet"] or gui_main.always_show_jewelry.checkState():
             prefix += poepy.ItemFilterEntry("Amulet",user_info.cfg.get("form","color_amulet_rgba")).to_str()          
-        if currently_shown_slot["Ring"] or gui_main.always_show_jewelry.checkState():
+        if slots_visible_on_filter["Ring"] or gui_main.always_show_jewelry.checkState():
             prefix += poepy.ItemFilterEntry("Ring",user_info.cfg.get("form","color_ring_rgba")).to_str()
     prefix += footer
 

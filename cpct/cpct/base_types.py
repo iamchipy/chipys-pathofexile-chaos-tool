@@ -8,6 +8,9 @@ print("Fetching basetype info . . .",end=" ")
 WEAPON_LIST = ["Sword", "Axe", "Dagger", "Staff", "Bow", "Wand", "Mace", "Sceptre", "Claw"]
 ITEM_BASE_TYPES_URL = "https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/base_items.json"
 
+# names of the slots
+SLOT_NAMES = ["Weapon","Helmet","Body Armour","Gloves","Boots","Gloves","Belt","Amulet","Ring"]   
+
 # combind slots for all weapon types to have a single slot "weapons"
 def slot_sub(key,value):
     if any(item in value for item in WEAPON_LIST):
@@ -36,6 +39,7 @@ if __name__ == "__main__":
     # print(SLOT_LOOKUP)
     # print(base_type_dict)
     print(BASE_TYPES)
+    print(SLOT_LOOKUP)
 
 
 
