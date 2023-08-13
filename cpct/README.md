@@ -110,11 +110,8 @@ However, there are some cases where I'd venture to ammend that sentiment. There 
 **Stability and Internals**
 
 [ ] PoE Api Rate limiter and logging
-
 [ ] Change OAuth to client auth type
-
 [ ] Secure method of fetching Secret ( likely subscription )
-
 [*] Rebuild item reading system into ENUM to easy class changes
 
 [*] Fix auto refresh not renewing the list in the GUI display
