@@ -297,24 +297,7 @@ def count_unid_rares(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser, for
         items_of_interest = parser.get_items(tab_of_interest, league_of_interest, force_recache)
         # p_l("items_of_interest>",type(items_of_interest))
 
-        # removed and done within PoE Item instead
-        # # filter for unid
-        # items_unidentified = parser.filter_identified(items_of_interest)
-        # # p_l("items_unidentified>",items_unidentified)
-
-        # # filter for ilevel
-        # items_unidentified_ilvl = parser.filter_ilvl(items_unidentified,min_ilvl)
-        # # p_l("items_unidentified_ilvl>",items_unidentified_ilvl)
-
-        # # filter for rares
-        # items_unidentified_ilvl_rare = parser.filter_rarity(items_unidentified_ilvl, rarity="rare")
-        # # p_l("items_unidentified_ilvl_rare>",items_unidentified_ilvl_rare)
-
-
-
-
-
-        # load recipes
+        # load recipes (now includes Rarity/ID filtering)
         recipe_handler = poepy.RecipeHandler(items_of_interest)
 
         # loop and count unids
@@ -470,10 +453,10 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
         for name in SLOT_NAMES:
             slots_visible_on_filter[name] = False
 
-    p_l("Looking for changes means filter requires updating . . .")
+    p_l("Looking for changes that require filter requires updating . . .")
     # check if filter needs changing
     for key, value in slot_count_percent.items():
-        p_l(f"Checking {key} . . .")
+        # p_l(f"Checking {key} . . .")
         # skip totals
         if key == "Total" or key not in slots_visible_on_filter:
             p_l(f"skipping {key}")
@@ -482,10 +465,12 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
         if value >= target:
             # value greater than target count and filter currently shows key we need to change it
             if slots_visible_on_filter[key]:
+                p_l(f"Filter section for {key} needs removed/hidden")
                 filter_updated = True
                 slots_visible_on_filter[key] = False
         elif value < target and not slots_visible_on_filter[key]:
              # value less than target count and filter currently NOT shows key we need to change it
+             p_l(f"Filter section for {key} needs added/shown")
              filter_updated = True
              slots_visible_on_filter[key] = True
         

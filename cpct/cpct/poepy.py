@@ -572,7 +572,12 @@ class RecipeHandler():
               "Belt":2,
               "Amulet":2,
               "Ring":4}    
-    def __init__(self, list_of_items:list) -> None:
+    def __init__(self, 
+                 list_of_items:list,
+                 recipe_mode:int=RECIPE_CHAOS, 
+                 identified:bool=False, 
+                 frame_type:int=FRAMETYPE_RARE) -> None:
+        
         print("Init RecipeHandler > ", end="")
         self.assigned_hashes = []
         self.ready_recipes = []
@@ -589,9 +594,9 @@ class RecipeHandler():
         #TODO-HIGH build ui input option for screen size
         #TODO-LOW build auto-dection options
 
+        # filters out identified and non-rare
         print("parsing > ", end="")
-        self.list_of_items = [item for item in self.simplify_items(list_of_items) if item.rarity==2]
-        #TODO-HIGH this needs to be replaced with self._fetch_item()
+        self.list_of_items = [item for item in self.simplify_items(list_of_items) if item.rarity==frame_type and item.identified==identified]
 
         print("tallying items > ", end="")
         self._tally_slots()
@@ -610,17 +615,13 @@ class RecipeHandler():
                     ilvl_range:list[int,int]=[60,99], 
                     identified:bool=False, 
                     frame_type:int=FRAMETYPE_RARE) -> PoEItemWrapper:
+
         assert isinstance(ilvl_range, list)
 
         for item in self.list_of_items:
             # check if hash has been assigned
             if item.hash in self.assigned_hashes:
                 continue
-
-            # check if item matches desired details
-            # if item.slot == slot and ilvl_range[0]<= item.ilvl <= ilvl_range[1] and item.identified == identified and item.rarity == frame_type:
-            #     self.assigned_hashes.append(item.hash)
-            #     return item
 
             if item.slot != slot:
                 # print(f"{slot} not satisfied by {item}") 
