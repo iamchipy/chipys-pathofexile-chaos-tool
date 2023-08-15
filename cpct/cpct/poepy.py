@@ -16,7 +16,7 @@ from __about__ import __version__
 import requests
 import websockets
 
-from base_types import SLOT_LOOKUP, WEAPON_LIST, SLOT_LIST
+from base_types import SLOT_LOOKUP, WEAPON_LIST
 
 HEADER_USER_AGENT ={"User-Agent": "OAuth chipytools/0.0.1 (Contact: contact@chipy.dev)"}
 HEADER_TYPE = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -48,6 +48,10 @@ FRAMETYPE_SUPPORTERFOIL = 10
 
 RECIPE_CHAOS = 60
 RECIPE_REGAL = 75 
+
+GRID_TAB = 1
+GRID_QUAD_TAB = 2
+GRID_INVENTORY = 3
 
 """
 PROCESS
@@ -590,7 +594,8 @@ class RecipeHandler():
                           "Amulet":0,
                           "Ring":0,
                           "Unknown":0}  
-        self.quad_1440 = StashGrid([18,175,866,1023])  
+        self.quad_1440 = ItemGrid([18,175,866,1023])  
+        self.inv_1440 = ItemGrid([1695,786,2537,1134],GRID_INVENTORY)  
         #TODO-HIGH build ui input option for screen size
         #TODO-LOW build auto-dection options
 
@@ -691,7 +696,7 @@ class RecipeHandler():
             processed_list.append(PoEItemWrapper(item))
         return processed_list
     
-    def _click_inv_grid(self,grid_coords:list[int,int], sleep_sec):
+    def _click_stash_grid(self,grid_coords:list[int,int], sleep_sec):
         coords = self.quad_1440.center_in_tile(self.quad_1440.grid2pixel_coords(grid_coords))
         print("moving:",grid_coords,coords)
         pyautogui.moveTo(coords[0], coords[1])
@@ -699,8 +704,15 @@ class RecipeHandler():
         pyautogui.click()
         time.sleep(sleep_sec)
 
-    def click_items_in_stash(self, sleep_sec:float=0.2):
+    def _click_inv_grid(self,grid_coords:list[int,int], sleep_sec):
+        coords = self.inv_1440.center_in_tile(self.inv_1440.grid2pixel_coords(grid_coords))
+        print("moving:",grid_coords,coords)
+        pyautogui.moveTo(coords[0], coords[1])
+        time.sleep(sleep_sec/2)
+        pyautogui.click()
+        time.sleep(sleep_sec)
 
+    def click_items_in_stash(self, sleep_sec:float=0.2):
         ingredients = self._collect_ingredients()
         if not self.is_recipe_complete(ingredients):
             print("Recipe missing ingredient")
@@ -711,22 +723,57 @@ class RecipeHandler():
         time.sleep(sleep_sec)    
         for ingredient, item in ingredients.items():
             print(ingredient)
-            self._click_inv_grid([item.x,item.y],sleep_sec)
+            self._click_stash_grid([item.x,item.y],sleep_sec)
   
-        pyautogui.keyUp('ctrl')        
-    
-class StashGrid():
-    quad_grid = [[[r+1,c+1] for r in range(24)] for c in range(24)]
+        pyautogui.keyUp('ctrl')    
 
-    def __init__(self,pixel_coords:list[int,int,int,int], grid_type:int=2) -> None:
+    def click_items_in_inventory(self, sleep_sec:float=0.2):
+        # start sequence
+        pyautogui.keyDown('ctrl')  
+        time.sleep(sleep_sec)    
+        self._click_inv_grid([0,0],sleep_sec)  # weapons
+        self._click_inv_grid([1,0],sleep_sec)
+        self._click_inv_grid([2,0],sleep_sec)
+        self._click_inv_grid([3,0],sleep_sec)
+        self._click_inv_grid([4,0],sleep_sec)  # bodies
+        self._click_inv_grid([6,0],sleep_sec)
+        self._click_inv_grid([0,3],sleep_sec)  # 2x2s
+        self._click_inv_grid([2,3],sleep_sec)  
+        self._click_inv_grid([4,3],sleep_sec)  
+        self._click_inv_grid([6,3],sleep_sec)  
+        self._click_inv_grid([8,3],sleep_sec)  
+        self._click_inv_grid([8,1],sleep_sec)  
+        self._click_inv_grid([8,4],sleep_sec)  #belts
+        self._click_inv_grid([11,0],sleep_sec)  
+        self._click_inv_grid([11,1],sleep_sec)  #1x1s
+        self._click_inv_grid([11,2],sleep_sec)  
+        self._click_inv_grid([10,1],sleep_sec)  
+        self._click_inv_grid([10,2],sleep_sec)  
+        self._click_inv_grid([10,3],sleep_sec)  
+        self._click_inv_grid([10,4],sleep_sec)  
+        pyautogui.keyUp('ctrl')      
+    
+class ItemGrid():
+    quad_grid = [[[r+1,c+1] for r in range(24)] for c in range(24)]
+    inv_grid = [[[c+1,r+1] for c in range(12)] for r in range(5)]
+    # TODO-Med/hi make sure that the Quad grid is working accurately
+
+    def __init__(self,pixel_coords:list[int,int,int,int], grid_type:int=GRID_QUAD_TAB) -> None:
+        """Handler for inventory/stash grids
+
+        Args:
+            pixel_coords (list[int,int,int,int]): top left and bot right coords of grid
+            grid_type (int/ENUM, optional): 1=GRID_TAB 2=GRID_QUAD_TAB 3=GRID_INVENTORY. Defaults to GRID_QUAD_TAB.
+        """
         if grid_type == 2:
-            self.grid_size = len(self.quad_grid[0])
-            # print(self.grid_size)
+            self.grid_size = len(self.quad_grid[1])
+        if grid_type == 3:
+            self.grid_size = len(self.inv_grid[1])
         self.pixel_coords = pixel_coords
         self.left_trim_pixel = pixel_coords[0]
         self.top_trim_pixel = pixel_coords[1]
         self.tile_size = (pixel_coords[2] - pixel_coords[0])/self.grid_size
-        # print(self.quad_grid)
+        #DEBUG print(f"Tile count = {self.grid_size} with size of {self.tile_size} and type {grid_type}")
     
     def grid2pixel_coords(self,grid_coords:list)-> list[int,int]:
         x_margin = self.left_trim_pixel
@@ -740,7 +787,7 @@ class StashGrid():
     def center_in_tile(self,pixel_coords:list)-> list[int,int]:
         x = pixel_coords[0]+self.tile_size/2
         y = pixel_coords[1]+self.tile_size/2
-        return [x,y]
+        return [x,y]  
     
 def validate_league(parser:DataParser, user_input:str=None):
     active_leagues = parser.get_leagues()
@@ -805,7 +852,6 @@ def _list_pywinauto_window_text(filter:str=""):
         title = win32gui.GetWindowText(handle)
         if filter in title:
             print(title)    
-
 
 def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):    
     def _get_pid_of_exe_path(exe_path:str):
