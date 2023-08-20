@@ -61,7 +61,7 @@ class AsyncMainWindow(QMainWindow):
         self.init_async()
 
     def init_async(self):
-        p_l(f"Initializing aync loop every ({ASYNC_INTERVAL_MS} ms). . . ", end="")
+        p_l(f"DEBUG:Initializing aync loop every ({ASYNC_INTERVAL_MS} ms). . . ", end="")
         self.log_timer.timeout.connect(async_two)
         self.log_timer.start(ASYNC_INTERVAL_MS)
         p_l(" done")
@@ -75,6 +75,8 @@ def p_l(*args, end="\n"):
         logging.critical(ts+str(*args))
     elif "error" in args[0]:
         logging.error(ts+str(*args))
+    elif "info" in args[0]:
+        logging.info(ts+str(*args))
     else:
         logging.debug(ts+str(args))
 
@@ -286,7 +288,7 @@ def count_unid_rares(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser, for
     refresh_off_cooldown = False
     gui.refresh_link.setEnabled(refresh_off_cooldown)
 
-    p_l("count_unid_rares()>league_of_interest>", league_of_interest)
+    p_l("DEBUG:count_unid_rares()>league_of_interest>", league_of_interest)
 
     try:
         # tab_of_interest
@@ -498,7 +500,7 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
             if not is_section_to_replace and footer not in line:
                 current_filter += line
 
-    p_l("Building itemfilter . . .")
+    p_l("LOG:Building itemfilter . . .")
     # rebuild filter text adding back in slots as needed   
     prefix = header
     if "Disabled" not in mode:
