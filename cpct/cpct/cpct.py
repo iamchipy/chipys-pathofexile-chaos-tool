@@ -1,3 +1,4 @@
+import qdarkstyle  # used to support a dark window theme
 import typing
 import datetime
 import os
@@ -559,6 +560,7 @@ def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
     global recipe_handler
     action_delay_sec = gui.set_delay.value()
     recipe_handler.click_items_in_stash(sleep_sec=action_delay_sec)
+    time.sleep(5)
     recipe_handler.click_items_in_inventory(sleep_sec=action_delay_sec)
 
 if __name__ == "__main__":
@@ -604,6 +606,9 @@ if __name__ == "__main__":
     p_l("Building GUI Connections . . .", end="")
     apply_ui_connections(gui_main, parser)
     p_l(" done")
+
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
 
     # run app as the last thing in the script
     sys.exit(app.exec_())
