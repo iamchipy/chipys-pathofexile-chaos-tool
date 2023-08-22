@@ -525,7 +525,7 @@ class ItemFilterEntry():
         return out_str
 
 class PoEItemWrapper():
-    def __init__(self, poe_item) -> None:
+    def __init__(self, poe_item:str="") -> None:
 
         # save raw data
         self.raw = poe_item
@@ -556,8 +556,9 @@ class PoEItemWrapper():
     
     def __repr__(self) -> str:
         simplified_info = self.__dict__
-        del simplified_info["raw"]
-        # del simplified_info["hash"]
+        # clear out the RAW data if it's still here
+        if "raw" in simplified_info:
+            del simplified_info['raw']
         return str(simplified_info)
     
     # def __iter__(self):
@@ -789,8 +790,8 @@ class ItemGrid():
         return [x,y]
     
     def center_in_tile(self,pixel_coords:list)-> list[int,int]:
-        x = pixel_coords[0]+self.tile_size/2
-        y = pixel_coords[1]+self.tile_size/2
+        x = round(pixel_coords[0]+self.tile_size/2)
+        y = round(pixel_coords[1]+self.tile_size/2)
         return [x,y]  
     
 def validate_league(parser:DataParser, user_input:str=None):
