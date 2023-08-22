@@ -657,25 +657,31 @@ class RecipeHandler():
 
     def _collect_ingredients(self, recipe_mode:int=RECIPE_CHAOS, identified:bool=False, frame_type:int=FRAMETYPE_RARE) -> list[PoEItemWrapper]:
         
-        # Set iLvl requirements (assuming the case to be Chaos we only check for regal)
-        requires_one_below_75 = True
-        if recipe_mode > 74:
-            requires_one_below_75 = False
-
+        # create a feedback variable
         ingredients = {}
-        for ingredient, quantity in self.RECIPE.items():
-            for index in range(quantity):
-                # ask for ingredient below 75 if need, until met
-                if requires_one_below_75 and not (ingredient == "Weapon" or ingredient == "Ring"):
-                    item = self._fetch_item(ingredient, [60,74], identified, frame_type)
-                    if item:
-                        requires_one_below_75 = False
-                        print("SELECTED FOR FORCE iLEVEL:",item)
+
+        # loops twice since we can find two recipies in an inventory
+        for set_index in range(2):
+            # Set iLvl requirements (assuming the case to be Chaos we only check for regal)
+            requires_one_below_75 = True
+            if recipe_mode > 74:
+                requires_one_below_75 = False
+            
+            for ingredient, quantity in self.RECIPE.items():
+                for index in range(quantity):
+                    # ask for ingredient below 75 if need, until met
+                    if requires_one_below_75 and not (ingredient == "Weapon" or ingredient == "Ring"):
+                        item = self._fetch_item(ingredient, [60,74], identified, frame_type)
+                        if item:
+                            requires_one_below_75 = False
+                            #TODO-LOW move P_L() to sub package and import here too
+                            print("SELECTING >> for iLvl blocking >> set_{set_index} >> ",item)
+                        else:
+                            item = self._fetch_item(ingredient, [60,100], identified, frame_type)
                     else:
                         item = self._fetch_item(ingredient, [60,100], identified, frame_type)
-                else:
-                    item = self._fetch_item(ingredient, [60,100], identified, frame_type)
-                ingredients[ingredient+"_"+str(index)] = item
+                    ingredients[f"{set_index}_{ingredient}_{index}"] = item
+        
         return ingredients          
 
     def display_stash_locations(self, count:int=2):

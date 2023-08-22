@@ -574,7 +574,7 @@ def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
     global recipe_handler
     action_delay_sec = gui.set_delay.value()
     recipe_handler.click_items_in_stash(sleep_sec=action_delay_sec)
-    recipe_handler.click_items_in_stash(sleep_sec=action_delay_sec)
+    # recipe_handler.click_items_in_stash(sleep_sec=action_delay_sec)
     # time.sleep(5)
     # recipe_handler.click_items_in_inventory(sleep_sec=action_delay_sec)
 
