@@ -536,9 +536,12 @@ def update_item_filter(gui, parser, force_recache:bool=False, always_show_rings:
     gui.count_report_string.setText(txt)
 
     if filter_updated:
+        p_l("Trying to update filter file...")
         filter_name = str(os.path.split(user_info.get("form", "filter_name"))[1]).split(".")[0]
-        path = user_info.get("form","client_path")
-        poepy.poe_chat(f"/itemfilter {filter_name}", f"{path}\PathOfExile.exe")
+        p_l(f"Filter path: {filter_name}")
+        path = user_info.get("form","client_path") +r"/PathOfExile.exe"
+        p_l(f"PoE_EXE: {path}")
+        poepy.poe_chat(f"/itemfilter {filter_name}", path)
             
 @timed_try_wrapper
 def request_client_secret():

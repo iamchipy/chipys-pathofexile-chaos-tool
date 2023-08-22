@@ -863,17 +863,25 @@ def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):
         """Get the executable path of the process associated with the given window handle."""
         for process in psutil.process_iter(['pid', 'exe']):
             if process.info['exe'] == exe_path:
-                # print(process.info['pid'])
+                print(process.info['pid'])
                 return process.info['pid']
+        print(f"Failed to find process for chat ({poe_exe_path})")
+        return False
 
+    # get PoE PID
     pid = _get_pid_of_exe_path(poe_exe_path)
-    # check for "PathOfExile.exe"
-    poe = pywinauto.Application().connect(process=pid)
-    # print(poe)
-    poe.PathOfExile.type_keys("{ENTER}"+msg+"{ENTER}", with_spaces=True, pause=0.00)
+
+    # if we have PID then try connect
+    if pid:
+        poe = pywinauto.Application().connect(process=pid)
+        # print(poe)
+        if auto_send:
+            poe.PathOfExile.type_keys("{ENTER}"+msg+"{ENTER}", with_spaces=True, pause=0.00)
+        else:
+            poe.PathOfExile.type_keys("{ENTER}"+msg, with_spaces=True, pause=0.00)
+        return True
+    return False
 
 
 if __name__ == "__main__":
-    pass
-    # pid = _get_pid_of_exe_path(r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe")
-    # poe_chat("/itemfilter dl",pid)
+    poe_chat("test", r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe", False)
