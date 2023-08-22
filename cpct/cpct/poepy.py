@@ -606,7 +606,7 @@ class RecipeHandler():
 
         # Sort/reorder list pushing high ilvl first to help with 
         self.list_of_items.sort(key=lambda obj: obj.ilvl, reverse=True)
-        print(self.list_of_items)
+        #debug print(self.list_of_items)
 
         print("tallying items > ", end="")
         self._tally_slots()
