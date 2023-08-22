@@ -865,8 +865,11 @@ def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):
             if process.info['exe'] == exe_path:
                 print(process.info['pid'])
                 return process.info['pid']
-        print(f"Failed to find process for chat ({poe_exe_path})")
+        print(f"Failed to find process for chat ('{poe_exe_path}')")
         return False
+
+    # fix "/" issues for input path
+    poe_exe_path = poe_exe_path.replace("/", "\\")
 
     # get PoE PID
     pid = _get_pid_of_exe_path(poe_exe_path)
@@ -884,4 +887,4 @@ def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):
 
 
 if __name__ == "__main__":
-    poe_chat("test", r"C:\Program Files (x86)\Grinding Gear Games\Path of Exile\PathOfExile.exe", False)
+    poe_chat("test", r"C:/Program Files (x86)/Grinding Gear Games/Path of Exile/PathOfExile.exe", False)
