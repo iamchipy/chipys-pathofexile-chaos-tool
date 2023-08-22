@@ -570,25 +570,25 @@ if __name__ == "__main__":
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # load user file
-    p_l("Loading user info . . .", end="")
+    p_l("INFO: Loading user info . . .", end="")
     user_info.load()
     p_l(". . . done")
 
-    p_l("Building API Object . . .", end="")
+    p_l("INFO: Building API Object . . .", end="")
     api = poepy.PoeApiHandler()
     p_l(" done")
-    p_l("Building DataParser . . .", end="")
+    p_l("INFO: Building DataParser . . .", end="")
     parser = poepy.DataParser(api_handler = api)
     p_l(" done")
 
-    p_l("Setting App Object . . .", end="")   
+    p_l("INFO: Setting App Object . . .", end="")   
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     p_l(" done")   
-    p_l("Building Main Window . . .")   
+    p_l("INFO: Building Main Window . . .")   
     MainWindow = AsyncMainWindow()
     MainWindow.show()
-    p_l("Building Main GUI . . .", end="")   
+    p_l("INFO: Building Main GUI . . .", end="")   
     gui_main = qt.main_gui.Ui_MainWindow()
     gui_main.setupUi(MainWindow)
     p_l(" done")   
@@ -599,11 +599,11 @@ if __name__ == "__main__":
     # MainWindow.setWindowFlags(Qt.FramelessWindowHint)
     
     
-    p_l("Setting GUI Defaults . . .", end="")
+    p_l("INFO: Setting GUI Defaults . . .", end="")
     apply_ui_defaults(gui_main, MainWindow, app) 
     p_l(" done")
 
-    p_l("Building GUI Connections . . .", end="")
+    p_l("INFO: Building GUI Connections . . .", end="")
     apply_ui_connections(gui_main, parser)
     p_l(" done")
 

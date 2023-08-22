@@ -603,6 +603,10 @@ class RecipeHandler():
         print("parsing > ", end="")
         self.list_of_items = [item for item in self.simplify_items(list_of_items) if item.rarity==frame_type and item.identified==identified]
 
+        # Sort/reorder list pushing high ilvl first to help with 
+        self.list_of_items.sort(key=lambda obj: obj.ilvl, reverse=True)
+        print(self.list_of_items)
+
         print("tallying items > ", end="")
         self._tally_slots()
 
@@ -621,7 +625,7 @@ class RecipeHandler():
                     identified:bool=False, 
                     frame_type:int=FRAMETYPE_RARE) -> PoEItemWrapper:
 
-        assert isinstance(ilvl_range, list)
+        assert isinstance(ilvl_range, list)  # if this fail we were not provided with a valid ilvl range in list form
 
         for item in self.list_of_items:
             # check if hash has been assigned
