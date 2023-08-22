@@ -140,6 +140,9 @@ def apply_ui_defaults(gui_obj:qt.main_gui.Ui_MainWindow, window_obj, app_obj):
     gui_obj.client_secret_input.setText(user_info.get("api","client_secret"))
     gui_obj.client_path_browse.setText(user_info.get("form", "client_path")[0:22]+"..."+user_info.get("form", "client_path")[-13:])
     gui_obj.sets_target.setValue(int(user_info.get("form", "sets_goal")))
+    if int(user_info.get("form", "always_show_jewelry")) > 0:
+        gui_obj.always_show_jewelry.setChecked(1)
+    gui_obj.set_delay.setValue(float(user_info.get("form", "action_delay")))
 
     # set previous colours
     gui_obj.count_amulets.setStyleSheet(style_sheet_new_color(PROGRESS_BAR_STYLE, user_info.get("form", "color_amulet_rgba")))
@@ -189,18 +192,19 @@ def apply_ui_connections(gui_obj:qt.main_gui.Ui_MainWindow, parser:poepy.DataPar
     #ClientSecrect Menu
     # gui_obj.actionInput_ClientSecret.triggered.connect(lambda: receive_client_secret(gui_obj) )
 
-    # # link buttons
+    # # link buttons (and checkboxes)
     gui_obj.login_link.clicked.connect(lambda: action_login_link(gui_obj, parser))
     gui_obj.refresh_link.clicked.connect(lambda: update_item_filter(gui_obj, parser, True))
     gui_obj.item_filter_browse.clicked.connect(lambda: browser_item_filters(gui_obj))
     gui_obj.client_path_browse.clicked.connect(lambda: browser_client_folder(gui_obj))
-
+    gui_obj.always_show_jewelry.clicked.connect(lambda: change_always_show_jewelry(gui_obj))
+    
     # Link ComboBoxes
     gui_obj.select_league.activated.connect(lambda: action_set_league(gui_obj, parser))
-    # gui_obj.select_league.currentIndexChanged.connect(lambda: action_set_league(gui_obj))
     gui_obj.select_tab.activated.connect(lambda: action_set_tab(gui_obj))
     gui_obj.filter_mode.activated.connect(lambda: update_item_filter(gui_obj, parser))
     gui_obj.sets_target.valueChanged.connect(lambda: change_target_count(gui_obj))
+    gui_obj.set_delay.valueChanged.connect(lambda: change_action_delay(gui_obj))
 
     # Link Text
     gui_obj.client_secret_input.textChanged.connect(lambda: receive_client_secret(gui_obj))
@@ -558,6 +562,13 @@ def request_client_secret():
 @timed_try_wrapper
 def change_target_count(gui:qt.main_gui.Ui_MainWindow):
     user_info.set("form","sets_goal", str(gui.sets_target.value()))
+
+def change_action_delay(gui:qt.main_gui.Ui_MainWindow):
+    user_info.set("form","action_delay", str(gui.set_delay.value()))
+
+def change_always_show_jewelry(gui:qt.main_gui.Ui_MainWindow):
+    p_l(f"Always show rings/amulets = {gui.always_show_jewelry.checkState()}")
+    user_info.set("form","always_show_jewelry", str(gui.always_show_jewelry.checkState()))
 
 def dev_button(gui:qt.main_gui.Ui_MainWindow, parser:poepy.DataParser):
     global recipe_handler
