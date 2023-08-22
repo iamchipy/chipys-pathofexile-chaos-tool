@@ -569,14 +569,14 @@ class PoEItemWrapper():
 
     
 class RecipeHandler():
-    RECIPE = {"Weapon":4,
-              "Helmet":2,
-              "Body Armour":2,
-              "Boots":2,
-              "Gloves":2,
-              "Belt":2,
-              "Amulet":2,
-              "Ring":4}    
+    RECIPE = {"Weapon":2,
+              "Helmet":1,
+              "Body Armour":1,
+              "Boots":1,
+              "Gloves":1,
+              "Belt":1,
+              "Amulet":1,
+              "Ring":2}    
     def __init__(self, 
                  list_of_items:list,
                  recipe_mode:int=RECIPE_CHAOS, 
@@ -863,7 +863,7 @@ def poe_chat(msg:str,poe_exe_path:str, auto_send:bool=True):
         """Get the executable path of the process associated with the given window handle."""
         for process in psutil.process_iter(['pid', 'exe']):
             if process.info['exe'] == exe_path:
-                print(process.info['pid'])
+                # print(process.info['pid'])
                 return process.info['pid']
         print(f"Failed to find process for chat ('{poe_exe_path}')")
         return False
