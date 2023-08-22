@@ -666,7 +666,7 @@ class RecipeHandler():
         for ingredient, quantity in self.RECIPE.items():
             for index in range(quantity):
                 # ask for ingredient below 75 if need, until met
-                if requires_one_below_75:
+                if requires_one_below_75 and not (ingredient == "Weapon" or ingredient == "Ring"):
                     item = self._fetch_item(ingredient, [60,74], identified, frame_type)
                     if item:
                         requires_one_below_75 = False

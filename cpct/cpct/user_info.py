@@ -21,7 +21,7 @@ def load():
                    "league":"standard",
                    "tab":"1",
                    "sets_goal":"4",
-                   "action_delay":"0.4",
+                   "action_delay":"0.04",
                    "always_show_jewelry":"1",
                    "color_weapon_rgba":"["+BASE_RGB+", 215]",
                    "color_helmet_rgba":"["+BASE_RGB+", 180]",
