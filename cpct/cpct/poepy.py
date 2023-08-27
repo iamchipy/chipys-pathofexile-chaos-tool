@@ -628,6 +628,8 @@ class RecipeHandler():
 
         assert isinstance(ilvl_range, list)  # if this fail we were not provided with a valid ilvl range in list form
 
+        #TODO-MED build in 2x3 size bows as weapon options
+
         for item in self.list_of_items:
             # check if hash has been assigned
             if item.hash in self.assigned_hashes:
